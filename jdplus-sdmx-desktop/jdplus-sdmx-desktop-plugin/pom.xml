@@ -5,11 +5,11 @@
 
     <parent>
         <groupId>com.github.nbbrd.jdemetra3-sdmx</groupId>
-        <artifactId>jd3-sdmx-desktop</artifactId>
+        <artifactId>jdplus-sdmx-desktop</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jd3-sdmx-desktop-plugin</artifactId>
+    <artifactId>jdplus-sdmx-desktop-plugin</artifactId>
     <packaging>nbm</packaging>
 
     <name>${project.artifactId}</name>
@@ -99,14 +99,14 @@
         <!-- 2. JD3 Desktop -->
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>
-            <artifactId>jd3-main-desktop-design</artifactId>
+            <artifactId>jdplus-main-desktop-design</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>
-            <artifactId>jd3-toolkit-desktop-plugin</artifactId>
-            <version>${jd3-main.version}</version>
+            <artifactId>jdplus-toolkit-desktop-plugin</artifactId>
+            <version>${jdplus-main.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.netbeans.api</groupId>
@@ -118,7 +118,7 @@
         <!-- 3. JD3 Base -->
         <dependency>
             <groupId>com.github.nbbrd.jdemetra3-sdmx</groupId>
-            <artifactId>jd3-sdmx-base-core</artifactId>
+            <artifactId>jdplus-sdmx-base-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 

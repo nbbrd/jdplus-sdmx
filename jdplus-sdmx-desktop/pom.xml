@@ -5,14 +5,14 @@
 
     <parent>
         <groupId>com.github.nbbrd.jdemetra3-sdmx</groupId>
-        <artifactId>jd3-sdmx</artifactId>
+        <artifactId>jdplus-sdmx</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jd3-sdmx-desktop</artifactId>
+    <artifactId>jdplus-sdmx-desktop</artifactId>
     <packaging>pom</packaging>
 
-    <name>jd3-sdmx-desktop</name>
+    <name>jdplus-sdmx-desktop</name>
 
     <properties>
         <!-- dependencies -->
@@ -20,7 +20,7 @@
     </properties>
 
     <modules>
-        <module>jd3-sdmx-desktop-plugin</module>
+        <module>jdplus-sdmx-desktop-plugin</module>
     </modules>
 
     <build>
