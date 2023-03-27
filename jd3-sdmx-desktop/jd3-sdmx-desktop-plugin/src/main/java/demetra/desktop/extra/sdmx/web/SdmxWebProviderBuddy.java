@@ -76,7 +76,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     public Image getIconOrNull(DataSource dataSource, int type, boolean opened) {
         Optional<SdmxWebProvider> lookupProvider = lookupProvider();
         if (lookupProvider.isPresent()) {
-            SdmxWebProvider provider = lookupProvider.get();
+            SdmxWebProvider provider = lookupProvider.orElseThrow();
             SdmxWebBean bean = provider.decodeBean(dataSource);
             SdmxWebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
             if (source != null) {
@@ -93,10 +93,10 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     public Image getIconOrNull(TsMoniker moniker, int type, boolean opened) {
         Optional<SdmxWebProvider> lookupProvider = lookupProvider();
         if (lookupProvider.isPresent()) {
-            SdmxWebProvider provider = lookupProvider.get();
+            SdmxWebProvider provider = lookupProvider.orElseThrow();
             Optional<DataSet> dataSet = provider.toDataSet(moniker);
             if (dataSet.isPresent()) {
-                SdmxWebBean bean = provider.decodeBean(dataSet.get().getDataSource());
+                SdmxWebBean bean = provider.decodeBean(dataSet.orElseThrow().getDataSource());
                 SdmxWebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
                 if (source != null) {
                     return getSourceIcon(provider, source);
