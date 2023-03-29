@@ -1,4 +1,4 @@
-module jdplus.sdmx.base.core {
+module jdplus.sdmx.base.api {
 
     requires static lombok;
     requires static nbbrd.design;
