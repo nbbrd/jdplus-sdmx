@@ -1,3 +1,7 @@
+import jdplus.sdmx.base.api.file.SdmxFileProvider;
+import jdplus.sdmx.base.api.web.SdmxWebProvider;
+import jdplus.toolkit.base.api.timeseries.TsProvider;
+
 module jdplus.sdmx.base.api {
 
     requires static lombok;
@@ -9,11 +13,11 @@ module jdplus.sdmx.base.api {
     requires jdplus.toolkit.base.tsp;
     requires nbbrd.io.base;
 
-    exports demetra.tsp.extra.sdmx;
-    exports demetra.tsp.extra.sdmx.file;
-    exports demetra.tsp.extra.sdmx.web;
+    exports jdplus.sdmx.base.api;
+    exports jdplus.sdmx.base.api.file;
+    exports jdplus.sdmx.base.api.web;
 
-    provides demetra.timeseries.TsProvider with
-            demetra.tsp.extra.sdmx.file.SdmxFileProvider,
-            demetra.tsp.extra.sdmx.web.SdmxWebProvider;
+    provides TsProvider with
+            SdmxFileProvider,
+            SdmxWebProvider;
 }

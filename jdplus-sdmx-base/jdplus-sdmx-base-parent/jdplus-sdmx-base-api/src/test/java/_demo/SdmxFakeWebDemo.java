@@ -16,10 +16,10 @@
  */
 package _demo;
 
-import demetra.demo.ProviderDemo;
-import demetra.tsp.extra.sdmx.web.SdmxWebBean;
-import demetra.tsp.extra.sdmx.web.SdmxWebProvider;
-import demetra.tsprovider.DataSource;
+import jdplus.toolkit.base.tspbridge.demo.ProviderDemo;
+import jdplus.sdmx.base.api.web.SdmxWebBean;
+import jdplus.sdmx.base.api.web.SdmxWebProvider;
+import jdplus.toolkit.base.tsp.DataSource;
 import sdmxdl.Feature;
 import sdmxdl.web.SdmxWebManager;
 import tests.sdmxdl.api.RepoSamples;
