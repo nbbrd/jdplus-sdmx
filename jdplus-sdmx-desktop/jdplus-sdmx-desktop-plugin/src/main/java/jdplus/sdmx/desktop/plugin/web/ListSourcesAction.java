@@ -1,8 +1,8 @@
 package jdplus.sdmx.desktop.plugin.web;
 
-import demetra.desktop.actions.AbilityNodeAction;
-import demetra.desktop.actions.Actions;
-import static demetra.desktop.tsproviders.TsProviderNodes.PROVIDER_ACTION_PATH;
+import jdplus.toolkit.desktop.plugin.actions.AbilityNodeAction;
+import jdplus.toolkit.desktop.plugin.actions.Actions;
+import static jdplus.toolkit.desktop.plugin.tsproviders.TsProviderNodes.PROVIDER_ACTION_PATH;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.tsp.DataSourceProvider;
 import java.awt.BorderLayout;

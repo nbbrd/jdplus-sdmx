@@ -1,8 +1,8 @@
 package jdplus.sdmx.desktop.plugin.file;
 
-import demetra.desktop.properties.NodePropertySetBuilder;
-import demetra.desktop.util.Caches;
-import demetra.desktop.util.Persistence;
+import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
+import jdplus.toolkit.desktop.plugin.util.Caches;
+import jdplus.toolkit.desktop.plugin.util.Persistence;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import java.time.Clock;
 import java.util.Locale;

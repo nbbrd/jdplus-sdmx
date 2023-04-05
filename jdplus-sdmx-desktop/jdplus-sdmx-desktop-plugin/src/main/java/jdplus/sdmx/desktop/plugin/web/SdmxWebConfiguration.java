@@ -1,8 +1,8 @@
 package jdplus.sdmx.desktop.plugin.web;
 
-import demetra.desktop.notification.MessageUtil;
-import demetra.desktop.properties.NodePropertySetBuilder;
-import demetra.desktop.util.Persistence;
+import jdplus.toolkit.desktop.plugin.notification.MessageUtil;
+import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
+import jdplus.toolkit.desktop.plugin.util.Persistence;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import internal.sdmx.desktop.plugin.CustomNetwork;
 import internal.sdmx.desktop.plugin.SdmxAutoCompletion;

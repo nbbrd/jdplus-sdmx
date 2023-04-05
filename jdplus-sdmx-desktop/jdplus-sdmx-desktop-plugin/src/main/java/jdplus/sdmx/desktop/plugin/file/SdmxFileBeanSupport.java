@@ -2,9 +2,9 @@ package jdplus.sdmx.desktop.plugin.file;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import demetra.desktop.properties.NodePropertySetBuilder;
-import demetra.desktop.ui.properties.FileLoaderFileFilter;
-import demetra.desktop.util.Caches;
+import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
+import jdplus.toolkit.desktop.plugin.ui.properties.FileLoaderFileFilter;
+import jdplus.toolkit.desktop.plugin.util.Caches;
 import jdplus.sdmx.base.api.file.SdmxFileBean;
 import jdplus.sdmx.base.api.file.SdmxFileProvider;
 import internal.sdmx.desktop.plugin.SdmxAutoCompletion;

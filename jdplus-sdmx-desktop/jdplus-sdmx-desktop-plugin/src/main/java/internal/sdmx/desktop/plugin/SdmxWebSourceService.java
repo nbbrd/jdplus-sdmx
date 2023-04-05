@@ -16,8 +16,8 @@
  */
 package internal.sdmx.desktop.plugin;
 
-import demetra.desktop.TsManager;
-import demetra.desktop.completion.AutoCompletionSpi;
+import jdplus.toolkit.desktop.plugin.TsManager;
+import jdplus.toolkit.desktop.plugin.completion.AutoCompletionSpi;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import ec.util.completion.swing.JAutoCompletion;
 import javax.swing.text.JTextComponent;

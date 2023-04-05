@@ -1,17 +1,17 @@
 package jdplus.sdmx.desktop.plugin.web;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import demetra.desktop.ColorSchemeManager;
-import demetra.desktop.TsManager;
+import jdplus.toolkit.desktop.plugin.ColorSchemeManager;
+import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.main.desktop.design.SwingAction;
 import jdplus.main.desktop.design.SwingComponent;
 import jdplus.main.desktop.design.SwingProperty;
-import demetra.desktop.tsproviders.DataSourceManager;
-import demetra.desktop.util.ActionMaps;
-import demetra.desktop.util.FontAwesomeUtils;
-import demetra.desktop.util.InputMaps;
-import demetra.desktop.util.KeyStrokes;
-import demetra.desktop.util.ListTableModel;
+import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
+import jdplus.toolkit.desktop.plugin.util.ActionMaps;
+import jdplus.toolkit.desktop.plugin.util.FontAwesomeUtils;
+import jdplus.toolkit.desktop.plugin.util.InputMaps;
+import jdplus.toolkit.desktop.plugin.util.KeyStrokes;
+import jdplus.toolkit.desktop.plugin.util.ListTableModel;
 import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import ec.util.chart.ColorScheme;

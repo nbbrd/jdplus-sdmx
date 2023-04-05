@@ -22,7 +22,7 @@ import sdmxdl.Dimension;
 import sdmxdl.LanguagePriorityList;
 import sdmxdl.web.SdmxWebManager;
 import sdmxdl.web.SdmxWebSource;
-import demetra.desktop.TsManager;
+import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import ec.util.completion.AutoCompletionSource;
 import static ec.util.completion.AutoCompletionSource.Behavior.ASYNC;

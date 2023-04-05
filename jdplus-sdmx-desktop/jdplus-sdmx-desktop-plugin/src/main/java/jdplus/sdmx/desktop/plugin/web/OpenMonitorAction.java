@@ -1,9 +1,9 @@
 package jdplus.sdmx.desktop.plugin.web;
 
-import demetra.desktop.TsManager;
-import demetra.desktop.actions.AbilityNodeAction;
-import demetra.desktop.actions.Actions;
-import static demetra.desktop.tsproviders.TsProviderNodes.SOURCE_ACTION_PATH;
+import jdplus.toolkit.desktop.plugin.TsManager;
+import jdplus.toolkit.desktop.plugin.actions.AbilityNodeAction;
+import jdplus.toolkit.desktop.plugin.actions.Actions;
+import static jdplus.toolkit.desktop.plugin.tsproviders.TsProviderNodes.SOURCE_ACTION_PATH;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.tsp.DataSource;
 import ec.util.desktop.Desktop;

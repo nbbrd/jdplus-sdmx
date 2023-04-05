@@ -16,12 +16,12 @@
  */
 package jdplus.sdmx.desktop.plugin.file;
 
-import demetra.desktop.Config;
-import demetra.desktop.Persistable;
-import demetra.desktop.TsManager;
-import demetra.desktop.actions.Configurable;
-import demetra.desktop.properties.PropertySheetDialogBuilder;
-import demetra.desktop.tsproviders.DataSourceProviderBuddy;
+import jdplus.toolkit.desktop.plugin.Config;
+import jdplus.toolkit.desktop.plugin.Persistable;
+import jdplus.toolkit.desktop.plugin.TsManager;
+import jdplus.toolkit.desktop.plugin.actions.Configurable;
+import jdplus.toolkit.desktop.plugin.properties.PropertySheetDialogBuilder;
+import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceProviderBuddy;
 import jdplus.sdmx.base.api.file.SdmxFileBean;
 import jdplus.sdmx.base.api.file.SdmxFileProvider;
 import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
