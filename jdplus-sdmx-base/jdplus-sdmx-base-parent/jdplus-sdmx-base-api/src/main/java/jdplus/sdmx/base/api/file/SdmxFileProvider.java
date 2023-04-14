@@ -36,6 +36,7 @@ import sdmxdl.file.SdmxFileSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * @author Philippe Charles
@@ -92,7 +93,7 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
 
     @Override
     public boolean accept(File pathname) {
-        return pathname.getName().toLowerCase().endsWith(".xml");
+        return pathname.getName().toLowerCase(Locale.ROOT).endsWith(".xml");
     }
 
     @Override

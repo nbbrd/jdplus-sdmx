@@ -33,11 +33,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -213,7 +209,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
 
     private DefaultTableCellRenderer newStatusRenderer() {
         return new DefaultTableCellRenderer() {
-            final Formatter<Number> uptimeRatioFormatter = Formatter.onNumberFormat(NumberFormat.getPercentInstance());
+            final Formatter<Number> uptimeRatioFormatter = Formatter.onNumberFormat(NumberFormat.getPercentInstance(Locale.getDefault(Locale.Category.DISPLAY)));
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
