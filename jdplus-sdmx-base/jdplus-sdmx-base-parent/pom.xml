@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.nbbrd.jplus-sdmx</groupId>
+        <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
         <artifactId>jdplus-sdmx-base</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>

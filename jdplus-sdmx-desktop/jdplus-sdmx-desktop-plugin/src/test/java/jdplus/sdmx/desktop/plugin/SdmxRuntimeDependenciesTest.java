@@ -29,7 +29,7 @@ public class SdmxRuntimeDependenciesTest {
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {
-        assertThatGroupId(coordinates, "com.github.nbbrd.jplus-sdmx")
+        assertThatGroupId(coordinates, "com.github.nbbrd.jdplus-sdmx")
                 .has(sameVersion())
                 .extracting(GAV::getArtifactId)
                 .are(matchingPattern(compile("^jdplus-sdmx-base-\\w+$")))
