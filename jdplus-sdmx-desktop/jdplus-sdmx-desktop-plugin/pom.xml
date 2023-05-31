@@ -100,7 +100,7 @@
         <dependency>
             <groupId>eu.europa.ec.joinup.sat</groupId>
             <artifactId>jdplus-main-desktop-design</artifactId>
-            <version>${project.version}</version>
+            <version>${jdplus-main.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
