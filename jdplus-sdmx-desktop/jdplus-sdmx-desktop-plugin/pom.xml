@@ -16,18 +16,6 @@
     <description>${project.parent.artifactId} - ${project.artifactId}</description>
     <url>${project.parent.url}</url>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.github.nbbrd.sdmx-dl</groupId>
-                <artifactId>sdmx-dl-bom</artifactId>
-                <version>3.0.0-beta.10</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- 1. NetBeans Platform -->
         <dependency>
@@ -126,6 +114,7 @@
         <dependency>
             <groupId>com.github.nbbrd.sdmx-dl</groupId>
             <artifactId>sdmx-dl-provider-ri</artifactId>
+            <version>${sdmx-dl.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.nbbrd.java-io-util</groupId>
@@ -136,6 +125,7 @@
         <dependency>
             <groupId>com.github.nbbrd.sdmx-dl</groupId>
             <artifactId>sdmx-dl-format-kryo</artifactId>
+            <version>${sdmx-dl.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.nbbrd.java-io-util</groupId>

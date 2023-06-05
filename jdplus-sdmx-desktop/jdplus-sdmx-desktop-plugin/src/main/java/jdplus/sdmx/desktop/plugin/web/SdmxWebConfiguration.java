@@ -1,18 +1,11 @@
 package jdplus.sdmx.desktop.plugin.web;
 
+import internal.sdmx.desktop.plugin.CustomNetwork;
+import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.notification.MessageUtil;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
-import jdplus.toolkit.base.tsp.util.PropertyHandler;
-import internal.sdmx.desktop.plugin.CustomNetwork;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.BiConsumer;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import nbbrd.design.MightBeGenerated;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
@@ -21,13 +14,22 @@ import sdmxdl.DataRepository;
 import sdmxdl.LanguagePriorityList;
 import sdmxdl.ext.Cache;
 import sdmxdl.format.FileFormat;
-import sdmxdl.format.kryo.KryoFileFormat;
+import sdmxdl.format.spi.FileFormatProvider;
+import sdmxdl.format.spi.FileFormatProviderLoader;
 import sdmxdl.format.xml.XmlWebSource;
 import sdmxdl.provider.ext.FileCache;
 import sdmxdl.provider.ext.VerboseCache;
 import sdmxdl.web.MonitorReports;
 import sdmxdl.web.SdmxWebManager;
 import sdmxdl.web.SdmxWebSource;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.BiConsumer;
 
 @lombok.Data
 public class SdmxWebConfiguration {
@@ -96,8 +98,8 @@ public class SdmxWebConfiguration {
         if (noCache) {
             return Cache.noOp();
         }
-        FileCache fileCache = getFileCache(false);
-        return getVerboseCache(fileCache, true);
+        Cache cache = getCache(false);
+        return getVerboseCache(cache, true);
     }
 
     private CustomNetwork toNetwork() {
@@ -121,23 +123,16 @@ public class SdmxWebConfiguration {
         return Collections.emptyList();
     }
 
-    private static FileCache getFileCache(boolean noCacheCompression) {
+    private static Cache getCache(boolean noCacheCompression) {
+        FileFormatProvider formatProvider = FileFormatProviderLoader.load().stream().findFirst().orElseThrow(RuntimeException::new);
+        FileFormat<DataRepository> repositoryFormat = formatProvider.getDataRepositoryFormat();
+        FileFormat<MonitorReports> monitorFormat = formatProvider.getMonitorReportsFormat();
         return FileCache
                 .builder()
-                .repositoryFormat(getRepositoryFormat(noCacheCompression))
-                .monitorFormat(getMonitorFormat(noCacheCompression))
+                .repositoryFormat(noCacheCompression ? repositoryFormat : FileFormat.gzip(repositoryFormat))
+                .monitorFormat(noCacheCompression ? monitorFormat : FileFormat.gzip(monitorFormat))
                 .onIOException(SdmxWebConfiguration::reportIOException)
                 .build();
-    }
-
-    private static FileFormat<DataRepository> getRepositoryFormat(boolean noCacheCompression) {
-        FileFormat<DataRepository> result = FileFormat.of(KryoFileFormat.REPOSITORY, ".kryo");
-        return noCacheCompression ? result : FileFormat.gzip(result);
-    }
-
-    private static FileFormat<MonitorReports> getMonitorFormat(boolean noCacheCompression) {
-        FileFormat<MonitorReports> result = FileFormat.of(KryoFileFormat.MONITOR, ".kryo");
-        return noCacheCompression ? result : FileFormat.gzip(result);
     }
 
     private static void reportIOException(String message, IOException error) {
