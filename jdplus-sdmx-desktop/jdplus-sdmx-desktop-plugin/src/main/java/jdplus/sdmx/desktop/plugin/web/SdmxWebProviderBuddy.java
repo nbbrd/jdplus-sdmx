@@ -16,31 +16,35 @@
  */
 package jdplus.sdmx.desktop.plugin.web;
 
+import ec.util.various.swing.FontAwesome;
+import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import jdplus.sdmx.base.api.web.SdmxWebBean;
+import jdplus.sdmx.base.api.web.SdmxWebProvider;
+import jdplus.toolkit.base.api.timeseries.TsMoniker;
+import jdplus.toolkit.base.tsp.DataSet;
+import jdplus.toolkit.base.tsp.DataSource;
 import jdplus.toolkit.desktop.plugin.Config;
 import jdplus.toolkit.desktop.plugin.Persistable;
 import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.toolkit.desktop.plugin.actions.Configurable;
 import jdplus.toolkit.desktop.plugin.properties.PropertySheetDialogBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceProviderBuddy;
-import jdplus.toolkit.base.api.timeseries.TsMoniker;
-import jdplus.sdmx.base.api.web.SdmxWebBean;
-import jdplus.sdmx.base.api.web.SdmxWebProvider;
-import jdplus.toolkit.base.tsp.DataSet;
-import jdplus.toolkit.base.tsp.DataSource;
-import static ec.util.chart.impl.TangoColorScheme.DARK_ORANGE;
-import static ec.util.chart.swing.SwingColorSchemeSupport.rgbToColor;
-import ec.util.various.swing.FontAwesome;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import java.awt.Image;
-import java.io.IOException;
-import java.util.Optional;
-import nbbrd.service.ServiceProvider;
 import nbbrd.design.DirectImpl;
+import nbbrd.service.ServiceProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import sdmxdl.Connection;
 import sdmxdl.Feature;
 import sdmxdl.web.SdmxWebSource;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import static ec.util.chart.impl.TangoColorScheme.DARK_ORANGE;
+import static ec.util.chart.swing.SwingColorSchemeSupport.rgbToColor;
 
 /**
  * @author Philippe Charles
@@ -107,7 +111,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     @Override
-    public Sheet getSheetOfBeanOrNull(Object bean) {
+    public List<Sheet.Set> getSheetOfBeanOrNull(@NonNull Object bean) {
         return bean instanceof SdmxWebBean ? getSheetOrNull((SdmxWebBean) bean) : null;
     }
 
@@ -134,7 +138,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
         updateProvider();
     }
 
-    private Sheet getSheetOrNull(SdmxWebBean bean) {
+    private List<Sheet.Set> getSheetOrNull(SdmxWebBean bean) {
         return lookupProvider().map(provider -> SdmxWebBeanSupport.newSheet(bean, provider)).orElse(null);
     }
 

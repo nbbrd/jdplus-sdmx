@@ -16,20 +16,23 @@
  */
 package jdplus.sdmx.desktop.plugin.file;
 
+import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import jdplus.sdmx.base.api.file.SdmxFileBean;
+import jdplus.sdmx.base.api.file.SdmxFileProvider;
 import jdplus.toolkit.desktop.plugin.Config;
 import jdplus.toolkit.desktop.plugin.Persistable;
 import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.toolkit.desktop.plugin.actions.Configurable;
 import jdplus.toolkit.desktop.plugin.properties.PropertySheetDialogBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceProviderBuddy;
-import jdplus.sdmx.base.api.file.SdmxFileBean;
-import jdplus.sdmx.base.api.file.SdmxFileProvider;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import java.awt.Image;
-import java.util.Optional;
 import nbbrd.design.DirectImpl;
 import nbbrd.service.ServiceProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.openide.nodes.Sheet;
+
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -61,7 +64,7 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
     }
 
     @Override
-    public Sheet getSheetOfBeanOrNull(Object bean) {
+    public List<Sheet.Set> getSheetOfBeanOrNull(@NonNull Object bean) {
         return bean instanceof SdmxFileBean ? getSheetOrNull((SdmxFileBean) bean) : null;
     }
 
@@ -88,7 +91,7 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
         updateProvider();
     }
 
-    private Sheet getSheetOrNull(SdmxFileBean bean) {
+    private List<Sheet.Set> getSheetOrNull(SdmxFileBean bean) {
         return lookupProvider().map(provider -> SdmxFileBeanSupport.newSheet(bean, provider)).orElse(null);
     }
 

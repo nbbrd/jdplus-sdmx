@@ -2,37 +2,39 @@ package jdplus.sdmx.desktop.plugin.web;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import jdplus.sdmx.base.api.web.SdmxWebBean;
+import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.TsProviderProperties;
 import jdplus.toolkit.desktop.plugin.util.Caches;
-import jdplus.sdmx.base.api.web.SdmxWebBean;
-import jdplus.sdmx.base.api.web.SdmxWebProvider;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import sdmxdl.DataflowRef;
 import sdmxdl.Dimension;
 import sdmxdl.web.SdmxWebSource;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
 @lombok.experimental.UtilityClass
 class SdmxWebBeanSupport {
 
     @NbBundle.Messages({
         "bean.cache.description=Mechanism used to improve performance."})
-    public static Sheet newSheet(SdmxWebBean bean, SdmxWebProvider provider) {
+    public static List<Sheet.Set> newSheet(SdmxWebBean bean, SdmxWebProvider provider) {
         ConcurrentMap autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
 
-        Sheet result = new Sheet();
+        List<Sheet.Set> result = new ArrayList<>();
         NodePropertySetBuilder b = new NodePropertySetBuilder();
-        result.put(withSource(b.reset("Source"), bean, provider, autoCompletionCache).build());
-        result.put(withOptions(b.reset("Options"), bean, provider, autoCompletionCache).build());
-        result.put(withCache(b.reset("Cache").description(Bundle.bean_cache_description()), bean).build());
+        result.add(withSource(b.reset("Source"), bean, provider, autoCompletionCache).build());
+        result.add(withOptions(b.reset("Options"), bean, provider, autoCompletionCache).build());
+        result.add(withCache(b.reset("Cache").description(Bundle.bean_cache_description()), bean).build());
         return result;
     }
 

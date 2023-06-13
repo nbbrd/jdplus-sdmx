@@ -2,21 +2,12 @@ package jdplus.sdmx.desktop.plugin.file;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import jdplus.sdmx.base.api.file.SdmxFileBean;
+import jdplus.sdmx.base.api.file.SdmxFileProvider;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.ui.properties.FileLoaderFileFilter;
 import jdplus.toolkit.desktop.plugin.util.Caches;
-import jdplus.sdmx.base.api.file.SdmxFileBean;
-import jdplus.sdmx.base.api.file.SdmxFileProvider;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import static internal.sdmx.base.api.SdmxCubeItems.resolveFileSet;
-import java.io.FileNotFoundException;
-import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import sdmxdl.DataflowRef;
@@ -24,18 +15,30 @@ import sdmxdl.Dimension;
 import sdmxdl.ext.Registry;
 import sdmxdl.file.SdmxFileSource;
 
+import java.io.FileNotFoundException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import static internal.sdmx.base.api.SdmxCubeItems.resolveFileSet;
+
 @lombok.experimental.UtilityClass
 class SdmxFileBeanSupport {
 
     @NbBundle.Messages({
         "bean.cache.description=Mechanism used to improve performance."})
-    public static Sheet newSheet(SdmxFileBean bean, SdmxFileProvider provider) {
+    public static List<Sheet.Set> newSheet(SdmxFileBean bean, SdmxFileProvider provider) {
         ConcurrentMap autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
 
-        Sheet result = new Sheet();
+        List<Sheet.Set> result = new ArrayList<>();
         NodePropertySetBuilder b = new NodePropertySetBuilder();
-        result.put(withSource(b.reset("Source"), bean, provider).build());
-        result.put(withOptions(b.reset("Options"), bean, provider, autoCompletionCache).build());
+        result.add(withSource(b.reset("Source"), bean, provider).build());
+        result.add(withOptions(b.reset("Options"), bean, provider, autoCompletionCache).build());
         return result;
     }
 
