@@ -57,7 +57,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
 
         <!-- dependencies -->
-        <jdplus-main.version>3.0.2-SNAPSHOT</jdplus-main.version>
+        <jdplus-main.version>3.0.2</jdplus-main.version>
         <sdmx-dl.version>3.0.0-beta.11</sdmx-dl.version>
     </properties>
 
