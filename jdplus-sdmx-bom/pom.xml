@@ -20,13 +20,18 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
-                <artifactId>jdplus-sdmx-cli-plugin</artifactId>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jdplus-sdmx-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
-                <artifactId>jdplus-sdmx-desktop-plugin</artifactId>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jdplus-sdmx-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>jdplus-sdmx-desktop</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
