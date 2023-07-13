@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 class SdmxWebBeanSupport {
 
     @NbBundle.Messages({
-        "bean.cache.description=Mechanism used to improve performance."})
+            "bean.cache.description=Mechanism used to improve performance."})
     public static List<Sheet.Set> newSheet(SdmxWebBean bean, SdmxWebProvider provider) {
         ConcurrentMap autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
 
@@ -39,10 +39,10 @@ class SdmxWebBeanSupport {
     }
 
     @NbBundle.Messages({
-        "bean.source.display=Provider",
-        "bean.source.description=The identifier of the service that provides data.",
-        "bean.flow.display=Dataflow",
-        "bean.flow.description=The identifier of a specific dataflow.",})
+            "bean.source.display=Provider",
+            "bean.source.description=The identifier of the service that provides data.",
+            "bean.flow.display=Dataflow",
+            "bean.flow.description=The identifier of a specific dataflow.",})
     private static NodePropertySetBuilder withSource(NodePropertySetBuilder b, SdmxWebBean bean, SdmxWebProvider provider, ConcurrentMap autoCompletionCache) {
         b.withAutoCompletion()
                 .select("source", bean::getSource, bean::setSource)
@@ -53,7 +53,7 @@ class SdmxWebBeanSupport {
 
         Supplier<SdmxWebSource> toSource = () -> getWebSourceOrNull(bean, provider);
 
-        SdmxAutoCompletion dataflow = SdmxAutoCompletion.onDataflow(provider.getSdmxManager(), toSource, autoCompletionCache);
+        SdmxAutoCompletion dataflow = SdmxAutoCompletion.onDataflow(provider.getSdmxManager(), provider.getLanguages(), toSource, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select("flow", bean::getFlow, bean::setFlow)
@@ -67,16 +67,16 @@ class SdmxWebBeanSupport {
     }
 
     @NbBundle.Messages({
-        "bean.dimensions.display=Dataflow dimensions",
-        "bean.dimensions.description=An optional comma-separated list of dimensions that defines the order used to hierarchise time series.",
-        "bean.labelAttribute.display=Series label attribute",
-        "bean.labelAttribute.description=An optional attribute that carries the label of time series."
+            "bean.dimensions.display=Dataflow dimensions",
+            "bean.dimensions.description=An optional comma-separated list of dimensions that defines the order used to hierarchise time series.",
+            "bean.labelAttribute.display=Series label attribute",
+            "bean.labelAttribute.description=An optional attribute that carries the label of time series."
     })
     private static NodePropertySetBuilder withOptions(NodePropertySetBuilder b, SdmxWebBean bean, SdmxWebProvider provider, ConcurrentMap autoCompletionCache) {
         Supplier<SdmxWebSource> toSource = () -> getWebSourceOrNull(bean, provider);
         Supplier<DataflowRef> toFlow = () -> getDataflowRefOrNull(bean);
 
-        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider.getSdmxManager(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select(bean, "dimensions", List.class,
@@ -89,7 +89,7 @@ class SdmxWebBeanSupport {
                 .description(Bundle.bean_dimensions_description())
                 .add();
 
-        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider.getSdmxManager(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select("labelAttribute", bean::getLabelAttribute, bean::setLabelAttribute)

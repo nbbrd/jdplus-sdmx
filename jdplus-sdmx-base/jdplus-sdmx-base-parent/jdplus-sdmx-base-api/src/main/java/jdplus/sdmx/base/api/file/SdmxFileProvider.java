@@ -16,17 +16,17 @@
  */
 package jdplus.sdmx.base.api.file;
 
-import jdplus.toolkit.base.api.timeseries.TsProvider;
+import internal.sdmx.base.api.SdmxCubeConnection;
+import internal.sdmx.base.api.SdmxCubeItems;
+import internal.sdmx.base.api.SdmxPropertiesSupport;
 import jdplus.sdmx.base.api.HasSdmxProperties;
+import jdplus.toolkit.base.api.timeseries.TsProvider;
 import jdplus.toolkit.base.tsp.*;
 import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
 import jdplus.toolkit.base.tsp.stream.HasTsStream;
 import jdplus.toolkit.base.tsp.stream.TsStreamAsProvider;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
-import internal.sdmx.base.api.SdmxCubeConnection;
-import internal.sdmx.base.api.SdmxCubeItems;
-import internal.sdmx.base.api.SdmxPropertiesSupport;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
@@ -122,7 +122,7 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
 
         DataflowRef flow = files.asDataflowRef();
 
-        Connection conn = properties.getSdmxManager().getConnection(files);
+        Connection conn = properties.getSdmxManager().getConnection(files, properties.getLanguages());
         try {
             return SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), getSourceLabel(bean));
         } catch (IOException ex) {

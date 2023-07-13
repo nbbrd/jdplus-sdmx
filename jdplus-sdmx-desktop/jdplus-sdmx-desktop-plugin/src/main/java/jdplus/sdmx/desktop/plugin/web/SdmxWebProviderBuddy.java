@@ -147,7 +147,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private static boolean supportsDataQueryDetail(SdmxWebProvider provider, SdmxWebSource source) {
-        try ( Connection conn = provider.getSdmxManager().getConnection(source)) {
+        try ( Connection conn = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
             return conn.getSupportedFeatures().contains(Feature.DATA_QUERY_DETAIL);
         } catch (IOException ex) {
             return false;

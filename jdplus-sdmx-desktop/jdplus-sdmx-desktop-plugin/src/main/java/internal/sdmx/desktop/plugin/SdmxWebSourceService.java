@@ -45,7 +45,7 @@ public final class SdmxWebSourceService implements AutoCompletionSpi {
         TsManager.get()
                 .getProvider(SdmxWebProvider.class)
                 .ifPresent(provider -> {
-                    SdmxAutoCompletion c = SdmxAutoCompletion.onWebSource(provider.getSdmxManager());
+                    SdmxAutoCompletion c = SdmxAutoCompletion.onWebSource(provider.getSdmxManager(), provider.getLanguages());
                     result.setSource(c.getSource());
                     result.getList().setCellRenderer(c.getRenderer());
                 });

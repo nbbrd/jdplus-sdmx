@@ -16,12 +16,13 @@
  */
 package jdplus.sdmx.base.api.web;
 
+import internal.sdmx.base.api.SdmxCubeConnection;
+import internal.sdmx.base.api.SdmxPropertiesSupport;
+import jdplus.sdmx.base.api.HasSdmxProperties;
 import jdplus.toolkit.base.api.timeseries.Ts;
 import jdplus.toolkit.base.api.timeseries.TsInformationType;
 import jdplus.toolkit.base.api.timeseries.TsProvider;
-import jdplus.sdmx.base.api.HasSdmxProperties;
 import jdplus.toolkit.base.tsp.*;
-import jdplus.toolkit.base.tsp.DataSet;
 import jdplus.toolkit.base.tsp.cube.BulkCubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
@@ -29,12 +30,13 @@ import jdplus.toolkit.base.tsp.stream.HasTsStream;
 import jdplus.toolkit.base.tsp.stream.TsStreamAsProvider;
 import jdplus.toolkit.base.tsp.util.IOCacheFactoryLoader;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
-import internal.sdmx.base.api.SdmxCubeConnection;
-import internal.sdmx.base.api.SdmxPropertiesSupport;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import sdmxdl.*;
+import sdmxdl.Connection;
+import sdmxdl.DataflowRef;
+import sdmxdl.Dimension;
+import sdmxdl.Key;
 import sdmxdl.web.SdmxWebManager;
 
 import java.io.IOException;
@@ -105,7 +107,7 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
 
     @NonNull
     public Ts getTs(@NonNull SdmxWebBean bean, @NonNull Key key, @NonNull TsInformationType type) throws IOException {
-        String[] dimsInNaturalOrder = dimsInNaturalOrder(getSdmxManager(), bean.getSource(), DataflowRef.parse(bean.getFlow()));
+        String[] dimsInNaturalOrder = dimsInNaturalOrder(this, bean.getSource(), DataflowRef.parse(bean.getFlow()));
 
         if (!Key.ALL.equals(key) && key.size() != dimsInNaturalOrder.length) {
             throw new IllegalArgumentException("Invalid key '" + key + "'");
@@ -128,8 +130,8 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
         return getTs(toMoniker(b.build()), type);
     }
 
-    private static String[] dimsInNaturalOrder(SdmxWebManager supplier, String source, DataflowRef flow) throws IOException {
-        try (Connection c = supplier.getConnection(source)) {
+    private static String[] dimsInNaturalOrder(HasSdmxProperties<SdmxWebManager> properties, String source, DataflowRef flow) throws IOException {
+        try (Connection c = properties.getSdmxManager().getConnection(source, properties.getLanguages())) {
             return c.getStructure(flow)
                     .getDimensions()
                     .stream()
@@ -143,7 +145,7 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
 
         DataflowRef flow = DataflowRef.parse(bean.getFlow());
 
-        Connection conn = properties.getSdmxManager().getConnection(bean.getSource());
+        Connection conn = properties.getSdmxManager().getConnection(bean.getSource(), properties.getLanguages());
         try {
             CubeConnection result = SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource());
             return BulkCubeConnection.of(result, bean.getCache(), IOCacheFactoryLoader.get());

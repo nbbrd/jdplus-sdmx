@@ -1,20 +1,20 @@
 package jdplus.sdmx.desktop.plugin.file;
 
+import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Caches;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
-import jdplus.toolkit.base.tsp.util.PropertyHandler;
-import java.time.Clock;
-import java.util.Locale;
-import java.util.function.BiConsumer;
 import nbbrd.design.MightBeGenerated;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.LanguagePriorityList;
-import sdmxdl.ext.Cache;
+import sdmxdl.EventListener;
+import sdmxdl.Languages;
 import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.SdmxFileSource;
-import sdmxdl.provider.ext.MapCache;
+import sdmxdl.file.spi.FileCaching;
+import sdmxdl.format.MemCachingSupport;
+
+import java.util.Locale;
 
 @lombok.Data
 public class SdmxFileConfiguration {
@@ -38,29 +38,29 @@ public class SdmxFileConfiguration {
     public SdmxFileManager toSdmxFileManager() {
         return SdmxFileManager.ofServiceLoader()
                 .toBuilder()
-                .languages(toLanguages())
-                .eventListener(toEventListener())
-                .cache(toCache())
+                .onEvent(toEventListener())
+                .caching(toCache())
                 .build();
     }
 
-    private LanguagePriorityList toLanguages() throws IllegalArgumentException {
-        return languages != null ? LanguagePriorityList.parse(languages) : LanguagePriorityList.ANY;
+    public Languages toLanguages() throws IllegalArgumentException {
+        return languages != null ? Languages.parse(languages) : Languages.ANY;
     }
 
-    private BiConsumer<? super SdmxFileSource, ? super String> toEventListener() {
-        return (source, message) -> StatusDisplayer.getDefault().setStatusText(message);
+    private EventListener<? super SdmxFileSource> toEventListener() {
+        return (source, marker, message) -> StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private Cache toCache() {
+    private FileCaching toCache() {
         if (noCache) {
-            return Cache.noOp();
+            return FileCaching.noOp();
         }
-        return MapCache.of(
-                Caches.softValuesCacheAsMap(),
-                Caches.softValuesCacheAsMap(),
-                Clock.systemDefaultZone()
-        );
+        return MemCachingSupport
+                .builder()
+                .id("SHARED_SOFT_MEM")
+                .repositoriesOf(Caches.softValuesCacheAsMap())
+                .webMonitorsOf(Caches.softValuesCacheAsMap())
+                .build();
     }
 
     Sheet toSheet() {

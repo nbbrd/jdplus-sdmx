@@ -25,7 +25,7 @@ public class SdmxRuntimeDependenciesTest {
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmxdl)
                 .satisfies(SdmxRuntimeDependenciesTest::checkNetworkLibs)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJavaDesktopUtil)
-                .hasSize(16);
+                .hasSize(19);
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {

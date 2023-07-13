@@ -12,7 +12,6 @@ import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import sdmxdl.DataflowRef;
 import sdmxdl.Dimension;
-import sdmxdl.ext.Registry;
 import sdmxdl.file.SdmxFileSource;
 
 import java.io.FileNotFoundException;
@@ -31,7 +30,7 @@ import static internal.sdmx.base.api.SdmxCubeItems.resolveFileSet;
 class SdmxFileBeanSupport {
 
     @NbBundle.Messages({
-        "bean.cache.description=Mechanism used to improve performance."})
+            "bean.cache.description=Mechanism used to improve performance."})
     public static List<Sheet.Set> newSheet(SdmxFileBean bean, SdmxFileProvider provider) {
         ConcurrentMap autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
 
@@ -43,8 +42,8 @@ class SdmxFileBeanSupport {
     }
 
     @NbBundle.Messages({
-        "bean.file.display=Data file",
-        "bean.file.description=The path to the sdmx data file.",})
+            "bean.file.display=Data file",
+            "bean.file.description=The path to the sdmx data file.",})
     private static NodePropertySetBuilder withSource(NodePropertySetBuilder b, SdmxFileBean bean, SdmxFileProvider provider) {
         b.withFile()
                 .select("file", bean::getFile, bean::setFile)
@@ -58,14 +57,14 @@ class SdmxFileBeanSupport {
     }
 
     @NbBundle.Messages({
-        "bean.structureFile.display=Structure file",
-        "bean.structureFile.description=The path to the sdmx structure file.",
-        "bean.dialect.display=Dialect",
-        "bean.dialect.description=The name of the dialect used to parse the sdmx data file.",
-        "bean.dimensions.display=Dataflow dimensions",
-        "bean.dimensions.description=An optional comma-separated list of dimensions that defines the order used to hierarchise time series.",
-        "bean.labelAttribute.display=Series label attribute",
-        "bean.labelAttribute.description=An optional attribute that carries the label of time series."
+            "bean.structureFile.display=Structure file",
+            "bean.structureFile.description=The path to the sdmx structure file.",
+            "bean.dialect.display=Dialect",
+            "bean.dialect.description=The name of the dialect used to parse the sdmx data file.",
+            "bean.dimensions.display=Dataflow dimensions",
+            "bean.dimensions.description=An optional comma-separated list of dimensions that defines the order used to hierarchise time series.",
+            "bean.labelAttribute.display=Series label attribute",
+            "bean.labelAttribute.description=An optional attribute that carries the label of time series."
     })
     private static NodePropertySetBuilder withOptions(NodePropertySetBuilder b, SdmxFileBean bean, SdmxFileProvider provider, ConcurrentMap autoCompletionCache) {
         b.withFile()
@@ -77,20 +76,10 @@ class SdmxFileBeanSupport {
                 .directories(false)
                 .add();
 
-        SdmxAutoCompletion dialect = SdmxAutoCompletion.onDialect(Registry.ofServiceLoader());
-
-        b.withAutoCompletion()
-                .select("dialect", bean::getDialect, bean::setDialect)
-                .source(dialect.getSource())
-                .cellRenderer(dialect.getRenderer())
-                .display(Bundle.bean_dialect_display())
-                .description(Bundle.bean_dialect_description())
-                .add();
-
         Supplier<SdmxFileSource> toSource = () -> getFileSource(bean, provider).orElse(null);
         Supplier<DataflowRef> toFlow = () -> getFileSource(bean, provider).map(SdmxFileSource::asDataflowRef).orElse(null);
 
-        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider.getSdmxManager(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select(bean, "dimensions", List.class,
@@ -103,7 +92,7 @@ class SdmxFileBeanSupport {
                 .description(Bundle.bean_dimensions_description())
                 .add();
 
-        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider.getSdmxManager(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select("labelAttribute", bean::getLabelAttribute, bean::setLabelAttribute)

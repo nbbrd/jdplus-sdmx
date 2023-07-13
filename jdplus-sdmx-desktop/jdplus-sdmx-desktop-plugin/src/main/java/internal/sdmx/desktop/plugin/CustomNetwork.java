@@ -1,13 +1,15 @@
 package internal.sdmx.desktop.plugin;
 
-import internal.http.curl.CurlHttpURLConnection;
-import java.net.ProxySelector;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocketFactory;
+import lombok.NonNull;
+import nbbrd.io.curl.CurlHttpURLConnection;
 import nbbrd.net.proxy.SystemProxySelector;
 import nl.altindag.ssl.SSLFactory;
-import sdmxdl.web.Network;
-import sdmxdl.web.URLConnectionFactory;
+import sdmxdl.web.spi.Network;
+import sdmxdl.web.spi.URLConnectionFactory;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
+import java.net.ProxySelector;
 
 @lombok.Value
 @lombok.Builder(toBuilder = true)
@@ -24,13 +26,13 @@ public final class CustomNetwork implements Network {
 
     @lombok.NonNull
     @lombok.Getter(lazy = true)
-    private final SSLFactory lazySSLFactory = initSSLFactory();
+    private final sdmxdl.web.spi.SSLFactory lazySSLFactory = initSSLFactory();
 
     private ProxySelector initProxySelector() {
         return autoProxy ? SystemProxySelector.ofServiceLoader() : ProxySelector.getDefault();
     }
 
-    private SSLFactory initSSLFactory() {
+    private sdmxdl.web.spi.SSLFactory initSSLFactory() {
         SSLFactory.Builder result = SSLFactory.builder();
         if (defaultTrustMaterial) {
             result.withDefaultTrustMaterial();
@@ -38,12 +40,7 @@ public final class CustomNetwork implements Network {
         if (systemTrustMaterial) {
             result.withSystemTrustMaterial();
         }
-        return result.build();
-    }
-
-    @Override
-    public HostnameVerifier getHostnameVerifier() {
-        return getLazySSLFactory().getHostnameVerifier();
+        return new SSLFactoryAdapter(result.build());
     }
 
     @Override
@@ -52,12 +49,28 @@ public final class CustomNetwork implements Network {
     }
 
     @Override
-    public SSLSocketFactory getSSLSocketFactory() {
-        return getLazySSLFactory().getSslSocketFactory();
+    public sdmxdl.web.spi.@NonNull SSLFactory getSSLFactory() {
+        return getLazySSLFactory();
     }
 
     @Override
     public URLConnectionFactory getURLConnectionFactory() {
         return curlBackend ? CurlHttpURLConnection::of : URLConnectionFactory.getDefault();
+    }
+
+    @lombok.AllArgsConstructor
+    private static final class SSLFactoryAdapter implements sdmxdl.web.spi.SSLFactory {
+
+        private final @NonNull SSLFactory delegate;
+
+        @Override
+        public @NonNull SSLSocketFactory getSSLSocketFactory() {
+            return delegate.getSslSocketFactory();
+        }
+
+        @Override
+        public @NonNull HostnameVerifier getHostnameVerifier() {
+            return delegate.getHostnameVerifier();
+        }
     }
 }

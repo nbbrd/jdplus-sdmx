@@ -2,6 +2,7 @@ package jdplus.sdmx.desktop.plugin.web;
 
 import internal.sdmx.desktop.plugin.CustomNetwork;
 import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.util.WebCachingLoader;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.notification.MessageUtil;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
@@ -10,18 +11,14 @@ import nbbrd.design.MightBeGenerated;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.DataRepository;
-import sdmxdl.LanguagePriorityList;
-import sdmxdl.ext.Cache;
-import sdmxdl.format.FileFormat;
-import sdmxdl.format.spi.FileFormatProvider;
-import sdmxdl.format.spi.FileFormatProviderLoader;
+import sdmxdl.EventListener;
+import sdmxdl.Languages;
 import sdmxdl.format.xml.XmlWebSource;
-import sdmxdl.provider.ext.FileCache;
-import sdmxdl.provider.ext.VerboseCache;
-import sdmxdl.web.MonitorReports;
+import sdmxdl.provider.web.SingleNetworkingSupport;
 import sdmxdl.web.SdmxWebManager;
 import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.spi.Networking;
+import sdmxdl.web.spi.WebCaching;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
@@ -29,7 +26,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.BiConsumer;
 
 @lombok.Data
 public class SdmxWebConfiguration {
@@ -75,40 +71,45 @@ public class SdmxWebConfiguration {
         return result;
     }
 
-    SdmxWebManager toSdmxWebManager() {
+    public SdmxWebManager toSdmxWebManager() {
         return SdmxWebManager.ofServiceLoader()
                 .toBuilder()
-                .languages(toLanguages())
-                .eventListener(toEventListener())
-                .cache(toCache())
-                .network(toNetwork())
+                .onEvent(toEventListener())
+                .caching(toCache())
+                .networking(toNetwork())
                 .customSources(toSources())
                 .build();
     }
 
-    private LanguagePriorityList toLanguages() throws IllegalArgumentException {
-        return languages != null ? LanguagePriorityList.parse(languages) : LanguagePriorityList.ANY;
+    public Languages toLanguages() throws IllegalArgumentException {
+        return languages != null ? Languages.parse(languages) : Languages.ANY;
     }
 
-    private BiConsumer<? super SdmxWebSource, ? super String> toEventListener() {
-        return (source, message) -> StatusDisplayer.getDefault().setStatusText(message);
+    private EventListener<? super SdmxWebSource> toEventListener() {
+        return (source, marker, message) -> StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private Cache toCache() {
+    private WebCaching toCache() {
         if (noCache) {
-            return Cache.noOp();
+            return WebCaching.noOp();
         }
-        Cache cache = getCache(false);
-        return getVerboseCache(cache, true);
+        return WebCachingLoader.load();
     }
 
-    private CustomNetwork toNetwork() {
-        return CustomNetwork
+    private Networking toNetwork() {
+        CustomNetwork x = CustomNetwork
                 .builder()
                 .curlBackend(curlBackend)
                 .autoProxy(autoProxy)
                 .defaultTrustMaterial(!noDefaultSSL)
                 .systemTrustMaterial(!noSystemSSL)
+                .build();
+        return SingleNetworkingSupport
+                .builder()
+                .id("X")
+                .proxySelector(x::getProxySelector)
+                .sslFactory(x::getSSLFactory)
+                .urlConnectionFactory(x::getURLConnectionFactory)
                 .build();
     }
 
@@ -123,29 +124,10 @@ public class SdmxWebConfiguration {
         return Collections.emptyList();
     }
 
-    private static Cache getCache(boolean noCacheCompression) {
-        FileFormatProvider formatProvider = FileFormatProviderLoader.load().stream().findFirst().orElseThrow(RuntimeException::new);
-        FileFormat<DataRepository> repositoryFormat = formatProvider.getDataRepositoryFormat();
-        FileFormat<MonitorReports> monitorFormat = formatProvider.getMonitorReportsFormat();
-        return FileCache
-                .builder()
-                .repositoryFormat(noCacheCompression ? repositoryFormat : FileFormat.gzip(repositoryFormat))
-                .monitorFormat(noCacheCompression ? monitorFormat : FileFormat.gzip(monitorFormat))
-                .onIOException(SdmxWebConfiguration::reportIOException)
-                .build();
-    }
-
     private static void reportIOException(String message, IOException error) {
         NotificationDisplayer.getDefault().notify(message, SdmxAutoCompletion.getDefaultIcon(), "", null);
     }
 
-    private static Cache getVerboseCache(Cache delegate, boolean verbose) {
-        if (verbose) {
-            BiConsumer<String, Boolean> listener = (key, hit) -> StatusDisplayer.getDefault().setStatusText((hit ? "Hit " : "Miss ") + key);
-            return new VerboseCache(delegate, listener, listener);
-        }
-        return delegate;
-    }
 
     Sheet toSheet() {
         Sheet result = new Sheet();
