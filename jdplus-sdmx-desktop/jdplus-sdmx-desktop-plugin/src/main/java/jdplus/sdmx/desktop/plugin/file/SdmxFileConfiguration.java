@@ -1,19 +1,22 @@
 package jdplus.sdmx.desktop.plugin.file;
 
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Caches;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
+import nbbrd.io.text.Parser;
+import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.EventListener;
 import sdmxdl.Languages;
 import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.SdmxFileSource;
 import sdmxdl.file.spi.FileCaching;
 import sdmxdl.format.MemCachingSupport;
 
+import java.io.IOException;
 import java.util.Locale;
 
 @lombok.Data
@@ -38,24 +41,31 @@ public class SdmxFileConfiguration {
     public SdmxFileManager toSdmxFileManager() {
         return SdmxFileManager.ofServiceLoader()
                 .toBuilder()
-                .onEvent(toEventListener())
-                .caching(toCache())
+                .onEvent(this::reportEvent)
+                .onError(this::reportError)
+                .caching(toCaching())
                 .build();
     }
 
-    public Languages toLanguages() throws IllegalArgumentException {
-        return languages != null ? Languages.parse(languages) : Languages.ANY;
+    public Languages toLanguages() {
+        return Parser.of(Languages::parse)
+                .parseValue(languages)
+                .orElse(Languages.ANY);
     }
 
-    private EventListener<? super SdmxFileSource> toEventListener() {
-        return (source, marker, message) -> StatusDisplayer.getDefault().setStatusText(message.toString());
+
+    private void reportEvent(SdmxFileSource source, String marker, CharSequence message) {
+        StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private FileCaching toCache() {
-        if (noCache) {
-            return FileCaching.noOp();
-        }
-        return MemCachingSupport
+    private void reportError(SdmxFileSource source, String marker, CharSequence message, IOException error) {
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+    }
+
+    private FileCaching toCaching() {
+        return noCache
+                ? FileCaching.noOp()
+                : MemCachingSupport
                 .builder()
                 .id("SHARED_SOFT_MEM")
                 .repositoriesOf(Caches.softValuesCacheAsMap())

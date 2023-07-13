@@ -7,7 +7,7 @@ import ec.util.desktop.Desktop;
 import ec.util.desktop.DesktopManager;
 import ec.util.table.swing.JTables;
 import ec.util.various.swing.*;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.main.desktop.design.SwingAction;
 import jdplus.main.desktop.design.SwingComponent;
 import jdplus.main.desktop.design.SwingProperty;
@@ -197,7 +197,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (value instanceof SdmxWebSource source) {
                     result.setText(source.getId());
-                    result.setIcon(SdmxAutoCompletion.getFavicon(source.getWebsite(), table::repaint));
+                    result.setIcon(SdmxIcons.getFavicon(source.getWebsite(), table::repaint));
                 }
                 return result;
             }

@@ -19,8 +19,6 @@ package jdplus.sdmx.base.api.web;
 import internal.sdmx.base.api.SdmxCubeConnection;
 import internal.sdmx.base.api.SdmxPropertiesSupport;
 import jdplus.sdmx.base.api.HasSdmxProperties;
-import jdplus.toolkit.base.api.timeseries.Ts;
-import jdplus.toolkit.base.api.timeseries.TsInformationType;
 import jdplus.toolkit.base.api.timeseries.TsProvider;
 import jdplus.toolkit.base.tsp.*;
 import jdplus.toolkit.base.tsp.cube.BulkCubeConnection;
@@ -32,19 +30,12 @@ import jdplus.toolkit.base.tsp.util.IOCacheFactoryLoader;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import sdmxdl.Connection;
 import sdmxdl.DataflowRef;
-import sdmxdl.Dimension;
-import sdmxdl.Key;
 import sdmxdl.web.SdmxWebManager;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @author Philippe Charles
@@ -85,12 +76,12 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
         this.mutableListSupport = HasDataSourceMutableList.of(NAME, pool::remove);
         this.monikerSupport = HasDataMoniker.usingUri(NAME);
         this.beanSupport = HasDataSourceBean.of(NAME, param, param.getVersion());
-        this.cubeSupport = CubeSupport.of(NAME, pool.asFactory(o -> openConnection(o, properties, param)), param::getCubeIdParam);
+        this.cubeSupport = CubeSupport.of(NAME, pool.asFactory(o -> openConnection(o, properties, param, displayCodes.get())), param::getCubeIdParam);
         this.tsSupport = TsStreamAsProvider.of(NAME, cubeSupport, monikerSupport, pool::clear);
     }
 
     @Override
-    public String getDisplayName() {
+    public @lombok.NonNull String getDisplayName() {
         return "SDMX Web Services";
     }
 
@@ -105,49 +96,14 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
         }
     }
 
-    @NonNull
-    public Ts getTs(@NonNull SdmxWebBean bean, @NonNull Key key, @NonNull TsInformationType type) throws IOException {
-        String[] dimsInNaturalOrder = dimsInNaturalOrder(this, bean.getSource(), DataflowRef.parse(bean.getFlow()));
-
-        if (!Key.ALL.equals(key) && key.size() != dimsInNaturalOrder.length) {
-            throw new IllegalArgumentException("Invalid key '" + key + "'");
-        }
-
-        // we need to sort dimensions by wildcard in key because of provider issue
-        Comparator<Integer> c = (l, r) -> key.isWildcard(l) ? (key.isWildcard(r) ? 0 : 1) : (key.isWildcard(r) ? -1 : 0);
-        List<String> sortedDims = IntStream.range(0, dimsInNaturalOrder.length).boxed()
-                .sorted(c.thenComparingInt(o -> o))
-                .map(o -> dimsInNaturalOrder[o])
-                .collect(Collectors.toList());
-        bean.setDimensions(sortedDims);
-
-        DataSet.Builder b = DataSet.builder(encodeBean(bean), key.isSeries() ? DataSet.Kind.SERIES : DataSet.Kind.COLLECTION);
-        if (!Key.ALL.equals(key)) {
-            IntStream.range(0, dimsInNaturalOrder.length)
-                    .filter(o -> !key.isWildcard(o))
-                    .forEach(o -> b.parameter(dimsInNaturalOrder[o], key.get(o)));
-        }
-        return getTs(toMoniker(b.build()), type);
-    }
-
-    private static String[] dimsInNaturalOrder(HasSdmxProperties<SdmxWebManager> properties, String source, DataflowRef flow) throws IOException {
-        try (Connection c = properties.getSdmxManager().getConnection(source, properties.getLanguages())) {
-            return c.getStructure(flow)
-                    .getDimensions()
-                    .stream()
-                    .map(Dimension::getId)
-                    .toArray(String[]::new);
-        }
-    }
-
-    private static CubeConnection openConnection(DataSource source, HasSdmxProperties<SdmxWebManager> properties, SdmxWebParam param) throws IOException {
+    private static CubeConnection openConnection(DataSource source, HasSdmxProperties<SdmxWebManager> properties, SdmxWebParam param, boolean displayCodes) throws IOException {
         SdmxWebBean bean = param.get(source);
 
         DataflowRef flow = DataflowRef.parse(bean.getFlow());
 
         Connection conn = properties.getSdmxManager().getConnection(bean.getSource(), properties.getLanguages());
         try {
-            CubeConnection result = SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource());
+            CubeConnection result = SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource(), displayCodes);
             return BulkCubeConnection.of(result, bean.getCache(), IOCacheFactoryLoader.get());
         } catch (IOException ex) {
             Resource.ensureClosed(ex, conn);

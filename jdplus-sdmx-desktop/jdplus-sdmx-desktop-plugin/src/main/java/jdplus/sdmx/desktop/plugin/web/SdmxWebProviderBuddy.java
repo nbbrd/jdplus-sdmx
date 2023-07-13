@@ -17,7 +17,7 @@
 package jdplus.sdmx.desktop.plugin.web;
 
 import ec.util.various.swing.FontAwesome;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.api.timeseries.TsMoniker;
@@ -63,21 +63,25 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private void updateProvider() {
-        lookupProvider().ifPresent(provider -> provider.setSdmxManager(configuration.toSdmxWebManager()));
+        lookupProvider().ifPresent(provider -> {
+            provider.setSdmxManager(configuration.toSdmxWebManager());
+            provider.setLanguages(configuration.toLanguages());
+            provider.setDisplayCodes(configuration.isDisplayCodes());
+        });
     }
 
     @Override
-    public String getProviderName() {
+    public @lombok.NonNull String getProviderName() {
         return SOURCE;
     }
 
     @Override
     public Image getIconOrNull(int type, boolean opened) {
-        return SdmxAutoCompletion.getDefaultIcon().getImage();
+        return SdmxIcons.getDefaultIcon().getImage();
     }
 
     @Override
-    public Image getIconOrNull(DataSource dataSource, int type, boolean opened) {
+    public Image getIconOrNull(@lombok.NonNull DataSource dataSource, int type, boolean opened) {
         Optional<SdmxWebProvider> lookupProvider = lookupProvider();
         if (lookupProvider.isPresent()) {
             SdmxWebProvider provider = lookupProvider.orElseThrow();
@@ -94,7 +98,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     @Override
-    public Image getIconOrNull(TsMoniker moniker, int type, boolean opened) {
+    public Image getIconOrNull(@lombok.NonNull TsMoniker moniker, int type, boolean opened) {
         Optional<SdmxWebProvider> lookupProvider = lookupProvider();
         if (lookupProvider.isPresent()) {
             SdmxWebProvider provider = lookupProvider.orElseThrow();
@@ -120,7 +124,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
         SdmxWebConfiguration editable = SdmxWebConfiguration.copyOf(configuration);
         PropertySheetDialogBuilder editor = new PropertySheetDialogBuilder()
                 .title("Configure " + lookupProvider().map(SdmxWebProvider::getDisplayName).orElse(""))
-                .icon(SdmxAutoCompletion.getDefaultIcon());
+                .icon(SdmxIcons.getDefaultIcon());
         if (editor.editSheet(editable.toSheet())) {
             configuration = editable;
             updateProvider();
@@ -128,12 +132,12 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     @Override
-    public Config getConfig() {
+    public @lombok.NonNull Config getConfig() {
         return SdmxWebConfiguration.PERSISTENCE.loadConfig(configuration);
     }
 
     @Override
-    public void setConfig(Config config) throws IllegalArgumentException {
+    public void setConfig(@lombok.NonNull Config config) throws IllegalArgumentException {
         SdmxWebConfiguration.PERSISTENCE.storeConfig(configuration, config);
         updateProvider();
     }
@@ -143,11 +147,11 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private static Image getSourceIcon(SdmxWebProvider provider, SdmxWebSource source) {
-        return ImageUtilities.icon2Image(SdmxAutoCompletion.getFavicon(source.getWebsite()));
+        return ImageUtilities.icon2Image(SdmxIcons.getFavicon(source.getWebsite()));
     }
 
     private static boolean supportsDataQueryDetail(SdmxWebProvider provider, SdmxWebSource source) {
-        try ( Connection conn = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
+        try (Connection conn = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
             return conn.getSupportedFeatures().contains(Feature.DATA_QUERY_DETAIL);
         } catch (IOException ex) {
             return false;

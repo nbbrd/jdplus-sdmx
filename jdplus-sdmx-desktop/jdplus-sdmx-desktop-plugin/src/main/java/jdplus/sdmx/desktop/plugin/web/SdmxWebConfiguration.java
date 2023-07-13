@@ -1,17 +1,17 @@
 package jdplus.sdmx.desktop.plugin.web;
 
 import internal.sdmx.desktop.plugin.CustomNetwork;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import internal.util.WebCachingLoader;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.notification.MessageUtil;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
+import nbbrd.io.text.Parser;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.EventListener;
 import sdmxdl.Languages;
 import sdmxdl.format.xml.XmlWebSource;
 import sdmxdl.provider.web.SingleNetworkingSupport;
@@ -58,6 +58,10 @@ public class SdmxWebConfiguration {
     private static final boolean DEFAULT_NO_SYSTEM_SSL = false;
     private boolean noSystemSSL = DEFAULT_NO_SYSTEM_SSL;
 
+    private static final String DISPLAY_CODES_PROPERTY = "displayCodes";
+    private static final boolean DEFAULT_DISPLAY_CODES = false;
+    private boolean displayCodes = DEFAULT_DISPLAY_CODES;
+
     @MightBeGenerated
     public static SdmxWebConfiguration copyOf(SdmxWebConfiguration bean) {
         SdmxWebConfiguration result = new SdmxWebConfiguration();
@@ -68,35 +72,43 @@ public class SdmxWebConfiguration {
         result.autoProxy = bean.autoProxy;
         result.noDefaultSSL = bean.noDefaultSSL;
         result.noSystemSSL = bean.noSystemSSL;
+        result.displayCodes = bean.displayCodes;
         return result;
     }
 
     public SdmxWebManager toSdmxWebManager() {
         return SdmxWebManager.ofServiceLoader()
                 .toBuilder()
-                .onEvent(toEventListener())
-                .caching(toCache())
-                .networking(toNetwork())
+                .onEvent(this::reportEvent)
+                .onError(this::reportError)
+                .caching(toCaching())
+                .networking(toNetworking())
                 .customSources(toSources())
                 .build();
     }
 
-    public Languages toLanguages() throws IllegalArgumentException {
-        return languages != null ? Languages.parse(languages) : Languages.ANY;
+    public Languages toLanguages() {
+        return Parser.of(Languages::parse)
+                .parseValue(languages)
+                .orElse(Languages.ANY);
     }
 
-    private EventListener<? super SdmxWebSource> toEventListener() {
-        return (source, marker, message) -> StatusDisplayer.getDefault().setStatusText(message.toString());
+    private void reportEvent(SdmxWebSource source, String marker, CharSequence message) {
+        StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private WebCaching toCache() {
+    private void reportError(SdmxWebSource source, String marker, CharSequence message, IOException error) {
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+    }
+
+    private WebCaching toCaching() {
         if (noCache) {
             return WebCaching.noOp();
         }
         return WebCachingLoader.load();
     }
 
-    private Networking toNetwork() {
+    private Networking toNetworking() {
         CustomNetwork x = CustomNetwork
                 .builder()
                 .curlBackend(curlBackend)
@@ -123,11 +135,6 @@ public class SdmxWebConfiguration {
         }
         return Collections.emptyList();
     }
-
-    private static void reportIOException(String message, IOException error) {
-        NotificationDisplayer.getDefault().notify(message, SdmxAutoCompletion.getDefaultIcon(), "", null);
-    }
-
 
     Sheet toSheet() {
         Sheet result = new Sheet();
@@ -192,5 +199,6 @@ public class SdmxWebConfiguration {
             .with(PropertyHandler.onBoolean(AUTO_PROXY_PROPERTY, DEFAULT_AUTO_PROXY), SdmxWebConfiguration::isAutoProxy, SdmxWebConfiguration::setAutoProxy)
             .with(PropertyHandler.onBoolean(NO_DEFAULT_SSL_PROPERTY, DEFAULT_NO_DEFAULT_SSL), SdmxWebConfiguration::isNoDefaultSSL, SdmxWebConfiguration::setNoDefaultSSL)
             .with(PropertyHandler.onBoolean(NO_SYSTEM_SSL_PROPERTY, DEFAULT_NO_SYSTEM_SSL), SdmxWebConfiguration::isNoSystemSSL, SdmxWebConfiguration::setNoSystemSSL)
+            .with(PropertyHandler.onBoolean(DISPLAY_CODES_PROPERTY, DEFAULT_DISPLAY_CODES), SdmxWebConfiguration::isDisplayCodes, SdmxWebConfiguration::setDisplayCodes)
             .build();
 }

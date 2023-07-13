@@ -10,21 +10,14 @@ import jdplus.toolkit.desktop.plugin.ui.properties.FileLoaderFileFilter;
 import jdplus.toolkit.desktop.plugin.util.Caches;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
-import sdmxdl.DataflowRef;
 import sdmxdl.Dimension;
-import sdmxdl.file.SdmxFileSource;
 
-import java.io.FileNotFoundException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static internal.sdmx.base.api.SdmxCubeItems.resolveFileSet;
 
 @lombok.experimental.UtilityClass
 class SdmxFileBeanSupport {
@@ -32,7 +25,7 @@ class SdmxFileBeanSupport {
     @NbBundle.Messages({
             "bean.cache.description=Mechanism used to improve performance."})
     public static List<Sheet.Set> newSheet(SdmxFileBean bean, SdmxFileProvider provider) {
-        ConcurrentMap autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
+        ConcurrentMap<Object, Object> autoCompletionCache = Caches.ttlCacheAsMap(Duration.ofMinutes(1));
 
         List<Sheet.Set> result = new ArrayList<>();
         NodePropertySetBuilder b = new NodePropertySetBuilder();
@@ -66,7 +59,7 @@ class SdmxFileBeanSupport {
             "bean.labelAttribute.display=Series label attribute",
             "bean.labelAttribute.description=An optional attribute that carries the label of time series."
     })
-    private static NodePropertySetBuilder withOptions(NodePropertySetBuilder b, SdmxFileBean bean, SdmxFileProvider provider, ConcurrentMap autoCompletionCache) {
+    private static NodePropertySetBuilder withOptions(NodePropertySetBuilder b, SdmxFileBean bean, SdmxFileProvider provider, ConcurrentMap<Object, Object> autoCompletionCache) {
         b.withFile()
                 .select("structureFile", bean::getStructureFile, bean::setStructureFile)
                 .display(Bundle.bean_structureFile_display())
@@ -76,10 +69,7 @@ class SdmxFileBeanSupport {
                 .directories(false)
                 .add();
 
-        Supplier<SdmxFileSource> toSource = () -> getFileSource(bean, provider).orElse(null);
-        Supplier<DataflowRef> toFlow = () -> getFileSource(bean, provider).map(SdmxFileSource::asDataflowRef).orElse(null);
-
-        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion dimension = SdmxAutoCompletion.onDimension(provider, bean, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select(bean, "dimensions", List.class,
@@ -92,7 +82,7 @@ class SdmxFileBeanSupport {
                 .description(Bundle.bean_dimensions_description())
                 .add();
 
-        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider.getSdmxManager(), provider.getLanguages(), toSource, toFlow, autoCompletionCache);
+        SdmxAutoCompletion attribute = SdmxAutoCompletion.onAttribute(provider, bean, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select("labelAttribute", bean::getLabelAttribute, bean::setLabelAttribute)
@@ -102,13 +92,5 @@ class SdmxFileBeanSupport {
                 .description(Bundle.bean_labelAttribute_description())
                 .add();
         return b;
-    }
-
-    private static Optional<SdmxFileSource> getFileSource(SdmxFileBean bean, SdmxFileProvider provider) {
-        try {
-            return Optional.of(resolveFileSet(provider, bean));
-        } catch (FileNotFoundException ex) {
-            return Optional.empty();
-        }
     }
 }

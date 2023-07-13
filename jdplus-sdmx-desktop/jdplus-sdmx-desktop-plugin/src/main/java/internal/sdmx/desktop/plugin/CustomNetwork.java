@@ -13,7 +13,7 @@ import java.net.ProxySelector;
 
 @lombok.Value
 @lombok.Builder(toBuilder = true)
-public final class CustomNetwork implements Network {
+public class CustomNetwork implements Network {
 
     boolean curlBackend;
     boolean autoProxy;
@@ -22,11 +22,11 @@ public final class CustomNetwork implements Network {
 
     @lombok.NonNull
     @lombok.Getter(lazy = true)
-    private final ProxySelector lazyProxySelector = initProxySelector();
+    ProxySelector lazyProxySelector = initProxySelector();
 
     @lombok.NonNull
     @lombok.Getter(lazy = true)
-    private final sdmxdl.web.spi.SSLFactory lazySSLFactory = initSSLFactory();
+    sdmxdl.web.spi.SSLFactory lazySSLFactory = initSSLFactory();
 
     private ProxySelector initProxySelector() {
         return autoProxy ? SystemProxySelector.ofServiceLoader() : ProxySelector.getDefault();
@@ -44,7 +44,7 @@ public final class CustomNetwork implements Network {
     }
 
     @Override
-    public ProxySelector getProxySelector() {
+    public @NonNull ProxySelector getProxySelector() {
         return getLazyProxySelector();
     }
 
@@ -54,7 +54,7 @@ public final class CustomNetwork implements Network {
     }
 
     @Override
-    public URLConnectionFactory getURLConnectionFactory() {
+    public @NonNull URLConnectionFactory getURLConnectionFactory() {
         return curlBackend ? CurlHttpURLConnection::of : URLConnectionFactory.getDefault();
     }
 
