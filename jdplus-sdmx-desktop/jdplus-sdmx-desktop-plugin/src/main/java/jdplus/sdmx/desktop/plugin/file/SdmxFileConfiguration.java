@@ -101,7 +101,7 @@ public class SdmxFileConfiguration {
     static final Persistence<SdmxFileConfiguration> PERSISTENCE = Persistence
             .builderOf(SdmxFileConfiguration.class)
             .name("INSTANCE")
-            .version("VERSION")
+            .version("20230717")
             .with(PropertyHandler.onString(LANGUAGES_PROPERTY, DEFAULT_LANGUAGES), SdmxFileConfiguration::getLanguages, SdmxFileConfiguration::setLanguages)
             .with(PropertyHandler.onBoolean(NO_CACHE_PROPERTY, DEFAULT_NO_CACHE), SdmxFileConfiguration::isNoCache, SdmxFileConfiguration::setNoCache)
             .build();

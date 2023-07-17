@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix favicons transparency, cache and loading
+- Fix dimensions and attributes autocompletion
+
+### Changed
+
+- Bump sdmx-dl from 3.0.0-beta.11 to 3.0.0-beta.12
+
 ## [3.0.0] - 2023-06-14
 
 This is the **initial release** of SDMX extensions for JDemetra+ v3.  

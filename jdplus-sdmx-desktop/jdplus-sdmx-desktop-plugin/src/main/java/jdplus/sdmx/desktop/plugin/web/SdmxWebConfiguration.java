@@ -118,7 +118,7 @@ public class SdmxWebConfiguration {
                 .build();
         return SingleNetworkingSupport
                 .builder()
-                .id("X")
+                .id("DRY")
                 .proxySelector(x::getProxySelector)
                 .sslFactory(x::getSSLFactory)
                 .urlConnectionFactory(x::getURLConnectionFactory)
@@ -191,7 +191,7 @@ public class SdmxWebConfiguration {
     static final Persistence<SdmxWebConfiguration> PERSISTENCE = Persistence
             .builderOf(SdmxWebConfiguration.class)
             .name("INSTANCE")
-            .version("VERSION")
+            .version("20230717")
             .with(PropertyHandler.onFile(SOURCES_PROPERTY, DEFAULT_SOURCES), SdmxWebConfiguration::getSources, SdmxWebConfiguration::setSources)
             .with(PropertyHandler.onString(LANGUAGES_PROPERTY, DEFAULT_LANGUAGES), SdmxWebConfiguration::getLanguages, SdmxWebConfiguration::setLanguages)
             .with(PropertyHandler.onBoolean(CURL_BACKEND_PROPERTY, DEFAULT_CURL_BACKEND), SdmxWebConfiguration::isCurlBackend, SdmxWebConfiguration::setCurlBackend)

@@ -147,7 +147,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private static Image getSourceIcon(SdmxWebProvider provider, SdmxWebSource source) {
-        return ImageUtilities.icon2Image(SdmxIcons.getFavicon(source.getWebsite()));
+        return ImageUtilities.icon2Image(SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), source.getWebsite()));
     }
 
     private static boolean supportsDataQueryDetail(SdmxWebProvider provider, SdmxWebSource source) {
