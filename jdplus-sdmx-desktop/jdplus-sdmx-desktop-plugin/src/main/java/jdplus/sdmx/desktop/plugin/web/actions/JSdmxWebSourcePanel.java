@@ -1,4 +1,4 @@
-package jdplus.sdmx.desktop.plugin.web;
+package jdplus.sdmx.desktop.plugin.web.actions;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import ec.util.chart.ColorScheme;
