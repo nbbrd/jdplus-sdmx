@@ -2,10 +2,10 @@ package jdplus.sdmx.desktop.plugin;
 
 import jdplus.main.desktop.design.GAV;
 import nbbrd.design.MightBePromoted;
-import nbbrd.io.FileParser;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.Test;
+import standalone_sdmxdl.nbbrd.io.FileParser;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +25,7 @@ public class SdmxRuntimeDependenciesTest {
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmxdl)
                 .satisfies(SdmxRuntimeDependenciesTest::checkNetworkLibs)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJavaDesktopUtil)
-                .hasSize(19);
+                .hasSize(8);
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {
@@ -40,20 +40,7 @@ public class SdmxRuntimeDependenciesTest {
         assertThatGroupId(coordinates, "com.github.nbbrd.sdmx-dl")
                 .has(sameVersion())
                 .extracting(GAV::getArtifactId)
-                .are(matchingPattern(compile("^sdmx-dl-(api|provider-ri|provider-base|format-csv|format-xml|format-kryo|format-base)$")))
-                .hasSize(7);
-
-        assertThatGroupId(coordinates, "com.google.code.gson")
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("gson");
-
-        assertThatGroupId(coordinates, "com.github.tuupertunut")
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("powershell-lib-java");
-
-        assertThatGroupId(coordinates, "com.esotericsoftware.kryo")
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("kryo5");
+                .containsExactlyInAnyOrder("sdmx-dl-standalone");
     }
 
     private static void checkNetworkLibs(List<? extends GAV> coordinates) {

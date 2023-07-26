@@ -1,11 +1,11 @@
 package internal.sdmx.desktop.plugin;
 
 import lombok.NonNull;
-import nbbrd.io.curl.CurlHttpURLConnection;
 import nbbrd.net.proxy.SystemProxySelector;
 import nl.altindag.ssl.SSLFactory;
 import sdmxdl.web.spi.Network;
 import sdmxdl.web.spi.URLConnectionFactory;
+import standalone_sdmxdl.nbbrd.io.curl.CurlHttpURLConnection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;

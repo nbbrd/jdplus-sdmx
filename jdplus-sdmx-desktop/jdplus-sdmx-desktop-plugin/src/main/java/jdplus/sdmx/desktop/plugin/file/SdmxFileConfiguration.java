@@ -6,7 +6,7 @@ import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Caches;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
-import nbbrd.io.text.Parser;
+import standalone_sdmxdl.nbbrd.io.text.Parser;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
@@ -14,7 +14,7 @@ import sdmxdl.Languages;
 import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.SdmxFileSource;
 import sdmxdl.file.spi.FileCaching;
-import sdmxdl.format.MemCachingSupport;
+import standalone_sdmxdl.sdmxdl.format.MemCachingSupport;
 
 import java.io.IOException;
 import java.util.Locale;

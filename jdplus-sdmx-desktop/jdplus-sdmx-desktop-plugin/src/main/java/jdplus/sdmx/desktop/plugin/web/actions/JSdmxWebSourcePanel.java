@@ -21,7 +21,7 @@ import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
 import jdplus.toolkit.desktop.plugin.util.*;
 import nbbrd.design.swing.OnAnyThread;
 import nbbrd.design.swing.OnEDT;
-import nbbrd.io.text.Formatter;
+import standalone_sdmxdl.nbbrd.io.text.Formatter;
 import org.netbeans.swing.etable.ETable;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;

@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.nbbrd.sdmx-dl</groupId>
-            <artifactId>sdmx-dl-api</artifactId>
+            <artifactId>sdmx-dl-standalone</artifactId>
             <version>${sdmx-dl.version}</version>
         </dependency>
 
