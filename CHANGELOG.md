@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Allow configuration by environment variables
+
 ### Fixed
 
 - Fix favicons transparency, cache and loading

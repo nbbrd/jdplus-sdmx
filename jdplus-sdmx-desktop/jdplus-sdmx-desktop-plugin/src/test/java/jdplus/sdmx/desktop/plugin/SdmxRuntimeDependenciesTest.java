@@ -23,9 +23,8 @@ public class SdmxRuntimeDependenciesTest {
                 .describedAs("Check runtime dependencies")
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmx)
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmxdl)
-                .satisfies(SdmxRuntimeDependenciesTest::checkNetworkLibs)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJavaDesktopUtil)
-                .hasSize(8);
+                .hasSize(3);
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {
@@ -41,21 +40,6 @@ public class SdmxRuntimeDependenciesTest {
                 .has(sameVersion())
                 .extracting(GAV::getArtifactId)
                 .containsExactlyInAnyOrder("sdmx-dl-standalone");
-    }
-
-    private static void checkNetworkLibs(List<? extends GAV> coordinates) {
-        assertThatGroupId(coordinates, "com.github.nbbrd.java-net-proxy")
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("java-net-proxy");
-
-        assertThatGroupId(coordinates, "io.github.hakky54")
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("sslcontext-kickstart");
-
-        assertThatGroupId(coordinates, "org.slf4j")
-                .has(sameVersion())
-                .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("slf4j-api", "slf4j-jdk14");
     }
 
     private static void checkJavaDesktopUtil(List<? extends GAV> coordinates) {
