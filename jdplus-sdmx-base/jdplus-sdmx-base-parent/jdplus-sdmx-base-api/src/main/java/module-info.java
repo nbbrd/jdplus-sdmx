@@ -9,7 +9,7 @@ module jdplus.sdmx.base.api {
     requires static nbbrd.service;
     requires static org.checkerframework.checker.qual;
 
-    requires sdmx.dl.standalone;
+    requires sdmxdl.api;
     requires jdplus.toolkit.base.tsp;
     requires nbbrd.io.base;
 
