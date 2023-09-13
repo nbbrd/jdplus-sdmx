@@ -46,16 +46,16 @@ import java.util.stream.Stream;
 @lombok.RequiredArgsConstructor
 public final class SdmxCubeConnection implements CubeConnection {
 
-    public static SdmxCubeConnection of(Connection connection, DataflowRef ref, List<String> dimensions, String labelAttribute, String sourceLabel, boolean displayCodes) throws IOException {
-        Dataflow flow = connection.getFlow(ref);
-        DataStructure dsd = connection.getStructure(ref);
+    public static SdmxCubeConnection of(Connection connection, FlowRef ref, List<String> dimensions, String labelAttribute, String sourceLabel, boolean displayCodes) throws IOException {
+        Flow flow = connection.getFlow(ref);
+        Structure dsd = connection.getStructure(ref);
         CubeId root = getOrLoadRoot(dimensions, dsd);
         return new SdmxCubeConnection(connection, flow, dsd, root, labelAttribute, sourceLabel, displayCodes);
     }
 
     private final Connection connection;
-    private final Dataflow flow;
-    private final DataStructure dsd;
+    private final Flow flow;
+    private final Structure dsd;
     private final CubeId root;
     private final String labelAttribute;
     private final String sourceLabel;
@@ -161,7 +161,7 @@ public final class SdmxCubeConnection implements CubeConnection {
         return ref.getDimensionValue(index);
     }
 
-    private static String getDimensionCodeLabel(CubeId ref, DataStructure dsd) {
+    private static String getDimensionCodeLabel(CubeId ref, Structure dsd) {
         if (ref.isRoot()) {
             return "Invalid reference '" + dump(ref) + "'";
         }
@@ -178,7 +178,7 @@ public final class SdmxCubeConnection implements CubeConnection {
     }
 
     @VisibleForTesting
-    static Key getKey(DataStructure dsd, CubeId ref) {
+    static Key getKey(Structure dsd, CubeId ref) {
         if (ref.isRoot()) {
             return Key.ALL;
         }
@@ -195,11 +195,11 @@ public final class SdmxCubeConnection implements CubeConnection {
     @lombok.RequiredArgsConstructor
     static final class KeyConverter {
 
-        static KeyConverter of(DataStructure dsd, CubeId ref) {
+        static KeyConverter of(Structure dsd, CubeId ref) {
             return new KeyConverter(dsd, new CubeIdBuilder(dsd, ref));
         }
 
-        final DataStructure dsd;
+        final Structure dsd;
         final CubeIdBuilder builder;
 
         public Key toKey(CubeId a) {
@@ -217,7 +217,7 @@ public final class SdmxCubeConnection implements CubeConnection {
         private final int[] indices;
         private final String[] dimValues;
 
-        CubeIdBuilder(DataStructure dsd, CubeId ref) {
+        CubeIdBuilder(Structure dsd, CubeId ref) {
             this.ref = ref;
             this.indices = new int[ref.getDepth()];
             for (int i = 0; i < indices.length; i++) {
@@ -280,13 +280,13 @@ public final class SdmxCubeConnection implements CubeConnection {
         }
     }
 
-    private static CubeId getOrLoadRoot(List<String> dimensions, DataStructure dsd) {
+    private static CubeId getOrLoadRoot(List<String> dimensions, Structure dsd) {
         return dimensions.isEmpty()
                 ? CubeId.root(loadDefaultDimIds(dsd))
                 : CubeId.root(dimensions);
     }
 
-    private static List<String> loadDefaultDimIds(DataStructure dsd) {
+    private static List<String> loadDefaultDimIds(Structure dsd) {
         return dsd
                 .getDimensions()
                 .stream()

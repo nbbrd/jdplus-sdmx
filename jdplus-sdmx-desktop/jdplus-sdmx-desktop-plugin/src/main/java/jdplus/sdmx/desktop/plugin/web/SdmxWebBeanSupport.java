@@ -11,7 +11,7 @@ import jdplus.toolkit.desktop.plugin.util.Caches;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import sdmxdl.Dimension;
-import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.WebSource;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -44,12 +44,12 @@ class SdmxWebBeanSupport {
     private static NodePropertySetBuilder withSource(NodePropertySetBuilder b, SdmxWebBean bean, SdmxWebProvider provider, ConcurrentMap<Object, Object> autoCompletionCache) {
         b.withAutoCompletion()
                 .select("source", bean::getSource, bean::setSource)
-                .servicePath(SdmxWebSource.class.getName())
+                .servicePath(WebSource.class.getName())
                 .display(Bundle.bean_source_display())
                 .description(Bundle.bean_source_description())
                 .add();
 
-        SdmxAutoCompletion dataflow = SdmxAutoCompletion.onDataflow(provider, bean, autoCompletionCache);
+        SdmxAutoCompletion dataflow = SdmxAutoCompletion.onFlow(provider, bean, autoCompletionCache);
 
         b.withAutoCompletion()
                 .select("flow", bean::getFlow, bean::setFlow)

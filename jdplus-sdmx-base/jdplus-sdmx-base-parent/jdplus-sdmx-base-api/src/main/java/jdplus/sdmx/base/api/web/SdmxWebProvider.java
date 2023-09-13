@@ -31,7 +31,7 @@ import jdplus.toolkit.base.tsp.util.ResourcePool;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
-import sdmxdl.DataflowRef;
+import sdmxdl.FlowRef;
 import sdmxdl.web.SdmxWebManager;
 
 import java.io.IOException;
@@ -99,7 +99,7 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
     private static CubeConnection openConnection(DataSource source, HasSdmxProperties<SdmxWebManager> properties, SdmxWebParam param, boolean displayCodes) throws IOException {
         SdmxWebBean bean = param.get(source);
 
-        DataflowRef flow = DataflowRef.parse(bean.getFlow());
+        FlowRef flow = FlowRef.parse(bean.getFlow());
 
         Connection conn = properties.getSdmxManager().getConnection(bean.getSource(), properties.getLanguages());
         try {

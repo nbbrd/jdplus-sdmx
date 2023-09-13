@@ -21,7 +21,6 @@ import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
 import jdplus.toolkit.desktop.plugin.util.*;
 import nbbrd.design.swing.OnAnyThread;
 import nbbrd.design.swing.OnEDT;
-import standalone_sdmxdl.nbbrd.io.text.Formatter;
 import org.netbeans.swing.etable.ETable;
 import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
@@ -29,7 +28,8 @@ import sdmxdl.Languages;
 import sdmxdl.web.MonitorReport;
 import sdmxdl.web.MonitorStatus;
 import sdmxdl.web.SdmxWebManager;
-import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.WebSource;
+import standalone_sdmxdl.nbbrd.io.text.Formatter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -199,7 +199,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (value instanceof SdmxWebSource source) {
+                if (value instanceof WebSource source) {
                     result.setText(source.getId());
                     result.setIcon(SdmxIcons.getFavicon(sdmxManager.getNetworking(), source.getWebsite(), table::repaint));
                 }
@@ -215,7 +215,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (value instanceof SdmxWebSource source) {
+                if (value instanceof WebSource source) {
                     MonitorReport report = support.get(source, table::repaint);
                     result.setText("");
                     result.setToolTipText(uptimeRatioFormatter.formatAsString(report.getUptimeRatio()) + " uptime");
@@ -249,7 +249,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         private final Map<String, MonitorReport> cache;
 
         @OnEDT
-        public MonitorReport get(SdmxWebSource url, Runnable onUpdate) {
+        public MonitorReport get(WebSource url, Runnable onUpdate) {
             return url != null ? cache.computeIfAbsent(url.getId(), host -> request(url, onUpdate)) : fallback;
         }
 
@@ -259,13 +259,13 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @OnEDT
-        private MonitorReport request(SdmxWebSource url, Runnable onUpdate) {
+        private MonitorReport request(WebSource url, Runnable onUpdate) {
             executor.execute(() -> loadIntoCache(url, onUpdate));
             return fallback;
         }
 
         @OnAnyThread
-        private void loadIntoCache(SdmxWebSource url, Runnable onUpdate) {
+        private void loadIntoCache(WebSource url, Runnable onUpdate) {
             MonitorReport favicon = load(url);
             if (favicon != null) {
                 SwingUtilities.invokeLater(() -> {
@@ -276,7 +276,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @OnAnyThread
-        private MonitorReport load(SdmxWebSource url) {
+        private MonitorReport load(WebSource url) {
             report("Loading favicon for " + url.getId());
             try {
                 return sdmxManager.getMonitorReport(url);
@@ -292,12 +292,12 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
     }
 
-    private static final class WebSourceModel extends ListTableModel<SdmxWebSource> {
+    private static final class WebSourceModel extends ListTableModel<WebSource> {
 
-        private List<SdmxWebSource> values = Collections.emptyList();
+        private List<WebSource> values = Collections.emptyList();
         private Languages languages = Languages.ANY;
 
-        public void setValues(List<SdmxWebSource> values, Languages languages) {
+        public void setValues(List<WebSource> values, Languages languages) {
             this.values = values;
             this.languages = languages;
             fireTableDataChanged();
@@ -309,12 +309,12 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @Override
-        protected List<SdmxWebSource> getValues() {
+        protected List<WebSource> getValues() {
             return values;
         }
 
         @Override
-        protected Object getValueAt(SdmxWebSource row, int columnIndex) {
+        protected Object getValueAt(WebSource row, int columnIndex) {
             switch (columnIndex) {
                 case 0:
                     return row;
@@ -337,7 +337,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         @Override
         public void execute(JSdmxWebSourcePanel c) throws Exception {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
-            SdmxWebSource source = ((WebSourceModel) c.table.getModel()).getValues().get(idx);
+            WebSource source = ((WebSourceModel) c.table.getModel()).getValues().get(idx);
             TsManager.get().getProvider(SdmxWebProvider.class).ifPresent(provider -> {
                 SdmxWebBean bean = provider.newBean();
                 bean.setSource(source.getId());
@@ -383,7 +383,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             return super.toAction(c).withWeakListSelectionListener(c.table.getSelectionModel());
         }
 
-        private SdmxWebSource getSelection(JSdmxWebSourcePanel c) {
+        private WebSource getSelection(JSdmxWebSourcePanel c) {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
             return ((WebSourceModel) c.table.getModel()).getValues().get(idx);
         }
@@ -414,7 +414,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             return super.toAction(c).withWeakListSelectionListener(c.table.getSelectionModel());
         }
 
-        private SdmxWebSource getSelection(JSdmxWebSourcePanel c) {
+        private WebSource getSelection(JSdmxWebSourcePanel c) {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
             return ((WebSourceModel) c.table.getModel()).getValues().get(idx);
         }

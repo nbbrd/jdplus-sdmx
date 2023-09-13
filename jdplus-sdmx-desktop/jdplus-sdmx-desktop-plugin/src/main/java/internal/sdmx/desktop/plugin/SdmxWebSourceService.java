@@ -23,7 +23,7 @@ import jdplus.toolkit.desktop.plugin.completion.AutoCompletionSpi;
 import lombok.NonNull;
 import nbbrd.design.DirectImpl;
 import nbbrd.service.ServiceProvider;
-import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.WebSource;
 
 import javax.swing.text.JTextComponent;
 
@@ -36,7 +36,7 @@ public final class SdmxWebSourceService implements AutoCompletionSpi {
 
     @Override
     public @NonNull String getPath() {
-        return SdmxWebSource.class.getName();
+        return WebSource.class.getName();
     }
 
     @Override

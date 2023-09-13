@@ -36,7 +36,7 @@ import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
 import sdmxdl.Connection;
 import sdmxdl.Feature;
-import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.WebSource;
 
 import java.awt.*;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
         if (lookupProvider.isPresent()) {
             SdmxWebProvider provider = lookupProvider.orElseThrow();
             SdmxWebBean bean = provider.decodeBean(dataSource);
-            SdmxWebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
+            WebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
             if (source != null) {
                 Image result = getSourceIcon(provider, source);
                 return supportsDataQueryDetail(provider, source)
@@ -105,7 +105,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
             Optional<DataSet> dataSet = provider.toDataSet(moniker);
             if (dataSet.isPresent()) {
                 SdmxWebBean bean = provider.decodeBean(dataSet.orElseThrow().getDataSource());
-                SdmxWebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
+                WebSource source = provider.getSdmxManager().getSources().get(bean.getSource());
                 if (source != null) {
                     return getSourceIcon(provider, source);
                 }
@@ -146,11 +146,11 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
         return lookupProvider().map(provider -> SdmxWebBeanSupport.newSheet(bean, provider)).orElse(null);
     }
 
-    private static Image getSourceIcon(SdmxWebProvider provider, SdmxWebSource source) {
+    private static Image getSourceIcon(SdmxWebProvider provider, WebSource source) {
         return ImageUtilities.icon2Image(SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), source.getWebsite()));
     }
 
-    private static boolean supportsDataQueryDetail(SdmxWebProvider provider, SdmxWebSource source) {
+    private static boolean supportsDataQueryDetail(SdmxWebProvider provider, WebSource source) {
         try (Connection conn = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
             return conn.getSupportedFeatures().contains(Feature.DATA_QUERY_DETAIL);
         } catch (IOException ex) {

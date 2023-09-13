@@ -31,9 +31,9 @@ import lombok.NonNull;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
-import sdmxdl.DataflowRef;
+import sdmxdl.FlowRef;
 import sdmxdl.file.SdmxFileManager;
-import sdmxdl.file.SdmxFileSource;
+import sdmxdl.file.FileSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,9 +119,9 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
 
     private static CubeConnection openConnection(DataSource dataSource, HasSdmxProperties<SdmxFileManager> properties, HasFilePaths paths, SdmxFileParam param) throws IOException {
         SdmxFileBean bean = param.get(dataSource);
-        SdmxFileSource files = SdmxCubeItems.resolveFileSet(paths, bean);
+        FileSource files = SdmxCubeItems.resolveFileSet(paths, bean);
 
-        DataflowRef flow = files.asDataflowRef();
+        FlowRef flow = files.asDataflowRef();
 
         Connection conn = properties.getSdmxManager().getConnection(files, properties.getLanguages());
         try {

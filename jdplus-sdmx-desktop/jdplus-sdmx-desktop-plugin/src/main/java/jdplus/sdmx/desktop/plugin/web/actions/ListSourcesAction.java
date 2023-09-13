@@ -38,7 +38,7 @@ public final class ListSourcesAction extends AbilityNodeAction<DataSourceProvide
     @Override
     protected void performAction(Stream<DataSourceProvider> items) {
         items.map(SdmxWebProvider.class::cast).forEach(item -> {
-            createComponent("SdmxWebSource", item.getSdmxManager());
+            createComponent("WebSource", item.getSdmxManager());
         });
     }
 

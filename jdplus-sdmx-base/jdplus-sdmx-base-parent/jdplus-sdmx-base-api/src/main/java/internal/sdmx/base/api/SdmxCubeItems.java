@@ -18,7 +18,7 @@ package internal.sdmx.base.api;
 
 import jdplus.sdmx.base.api.file.SdmxFileBean;
 import jdplus.toolkit.base.tsp.HasFilePaths;
-import sdmxdl.file.SdmxFileSource;
+import sdmxdl.file.FileSource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,8 +29,8 @@ import java.io.FileNotFoundException;
 @lombok.experimental.UtilityClass
 public class SdmxCubeItems {
 
-    public static SdmxFileSource resolveFileSet(HasFilePaths paths, SdmxFileBean bean) throws FileNotFoundException {
-        SdmxFileSource.Builder result = SdmxFileSource.builder().data(paths.resolveFilePath(bean.getFile()));
+    public static FileSource resolveFileSet(HasFilePaths paths, SdmxFileBean bean) throws FileNotFoundException {
+        FileSource.Builder result = FileSource.builder().data(paths.resolveFilePath(bean.getFile()));
         File structure = bean.getStructureFile();
         if (structure != null && !structure.toString().isEmpty()) {
             result.structure(paths.resolveFilePath(structure));
