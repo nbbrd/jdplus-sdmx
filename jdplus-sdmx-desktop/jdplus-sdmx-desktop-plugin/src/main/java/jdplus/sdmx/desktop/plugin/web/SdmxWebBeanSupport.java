@@ -1,13 +1,11 @@
 package jdplus.sdmx.desktop.plugin.web;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
+import internal.sdmx.desktop.plugin.Caches;
 import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
 import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.TsProviderProperties;
-import jdplus.toolkit.desktop.plugin.util.Caches;
 import org.openide.nodes.Sheet;
 import org.openide.util.NbBundle;
 import sdmxdl.Dimension;
@@ -19,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @lombok.experimental.UtilityClass
 class SdmxWebBeanSupport {
@@ -73,7 +72,8 @@ class SdmxWebBeanSupport {
 
         b.withAutoCompletion()
                 .select(bean, "dimensions", List.class,
-                        Joiner.on(',')::join, Splitter.on(',').trimResults().omitEmptyStrings()::splitToList)
+                        list -> String.join(",", ((List<String>) list)),
+                        text -> Stream.of(text.split(",", -1)).toList())
                 .source(dimension.getSource())
                 .cellRenderer(dimension.getRenderer())
                 .separator(",")

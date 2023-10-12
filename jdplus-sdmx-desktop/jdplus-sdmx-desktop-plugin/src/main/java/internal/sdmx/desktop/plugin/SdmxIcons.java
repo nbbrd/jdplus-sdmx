@@ -1,6 +1,5 @@
 package internal.sdmx.desktop.plugin;
 
-import jdplus.toolkit.desktop.plugin.util.Caches;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import nbbrd.desktop.favicon.DomainName;
