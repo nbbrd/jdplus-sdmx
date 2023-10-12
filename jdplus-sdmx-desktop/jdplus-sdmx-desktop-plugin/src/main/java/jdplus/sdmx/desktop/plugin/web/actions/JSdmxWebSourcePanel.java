@@ -1,6 +1,5 @@
 package jdplus.sdmx.desktop.plugin.web.actions;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import ec.util.chart.ColorScheme;
 import ec.util.chart.swing.SwingColorSchemeSupport;
 import ec.util.desktop.Desktop;
@@ -17,6 +16,7 @@ import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.desktop.plugin.ColorSchemeManager;
 import jdplus.toolkit.desktop.plugin.TsManager;
+import jdplus.toolkit.desktop.plugin.concurrent.DefaultThreadFactory;
 import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
 import jdplus.toolkit.desktop.plugin.util.*;
 import nbbrd.design.swing.OnAnyThread;
@@ -139,7 +139,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         support = StatusSupport
                 .builder()
                 .sdmxManager(sdmxManager)
-                .executor(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setPriority(Thread.MIN_PRIORITY).build()))
+                .executor(Executors.newCachedThreadPool(DefaultThreadFactory.builder().daemon(true).priority(Thread.MIN_PRIORITY).build()))
                 .cache(new HashMap<>())
                 .fallback(MonitorReport.builder().source("").status(MonitorStatus.UNKNOWN).build())
                 .build();

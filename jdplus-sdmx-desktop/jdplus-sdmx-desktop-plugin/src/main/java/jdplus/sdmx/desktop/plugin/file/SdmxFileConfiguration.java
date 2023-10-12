@@ -3,17 +3,16 @@ package jdplus.sdmx.desktop.plugin.file;
 import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
-import jdplus.toolkit.desktop.plugin.util.Caches;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
-import standalone_sdmxdl.nbbrd.io.text.Parser;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
 import sdmxdl.Languages;
-import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.FileSource;
+import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.spi.FileCaching;
+import standalone_sdmxdl.nbbrd.io.text.Parser;
 import standalone_sdmxdl.sdmxdl.format.MemCachingSupport;
 
 import java.io.IOException;
@@ -68,8 +67,8 @@ public class SdmxFileConfiguration {
                 : MemCachingSupport
                 .builder()
                 .id("SHARED_SOFT_MEM")
-                .repositoriesOf(Caches.softValuesCacheAsMap())
-                .webMonitorsOf(Caches.softValuesCacheAsMap())
+//                .repositoriesOf(Caches.softValuesCacheAsMap())
+//                .webMonitorsOf(Caches.softValuesCacheAsMap())
                 .build();
     }
 

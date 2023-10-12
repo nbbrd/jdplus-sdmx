@@ -26,7 +26,7 @@ import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
 import jdplus.toolkit.base.tsp.stream.HasTsStream;
 import jdplus.toolkit.base.tsp.stream.TsStreamAsProvider;
-import jdplus.toolkit.base.tsp.util.IOCacheFactoryLoader;
+import jdplus.toolkit.base.tsp.util.ShortLivedCachingLoader;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
@@ -104,7 +104,7 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
         Connection conn = properties.getSdmxManager().getConnection(bean.getSource(), properties.getLanguages());
         try {
             CubeConnection result = SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource(), displayCodes);
-            return BulkCubeConnection.of(result, bean.getCache(), IOCacheFactoryLoader.get());
+            return BulkCubeConnection.of(result, bean.getCache(), ShortLivedCachingLoader.get());
         } catch (IOException ex) {
             Resource.ensureClosed(ex, conn);
             throw ex;
