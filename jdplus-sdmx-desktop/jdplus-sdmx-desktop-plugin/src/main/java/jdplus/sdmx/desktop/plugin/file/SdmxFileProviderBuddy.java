@@ -1,22 +1,22 @@
 /*
  * Copyright 2017 National Bank of Belgium
- * 
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved 
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
  * by the European Commission - subsequent versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the Licence.
  * You may obtain a copy of the Licence at:
- * 
+ *
  * http://ec.europa.eu/idabc/eupl
- * 
- * Unless required by applicable law or agreed to in writing, software 
+ *
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the Licence is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and 
+ * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
  */
 package jdplus.sdmx.desktop.plugin.file;
 
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.sdmx.base.api.file.SdmxFileBean;
 import jdplus.sdmx.base.api.file.SdmxFileProvider;
 import jdplus.toolkit.desktop.plugin.Config;
@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
  * @author Philippe Charles
  */
 @DirectImpl
@@ -50,17 +49,20 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
     }
 
     private void updateProvider() {
-        lookupProvider().ifPresent(provider -> provider.setSdmxManager(configuration.toSdmxFileManager()));
+        lookupProvider().ifPresent(provider -> {
+            provider.setSdmxManager(configuration.toSdmxFileManager());
+            provider.setLanguages(configuration.toLanguages());
+        });
     }
 
     @Override
-    public String getProviderName() {
+    public @lombok.NonNull String getProviderName() {
         return SdmxFileProvider.NAME;
     }
 
     @Override
     public Image getIconOrNull(int type, boolean opened) {
-        return SdmxAutoCompletion.getDefaultIcon().getImage();
+        return SdmxIcons.getDefaultIcon().getImage();
     }
 
     @Override
@@ -73,7 +75,7 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
         SdmxFileConfiguration editable = SdmxFileConfiguration.copyOf(configuration);
         PropertySheetDialogBuilder editor = new PropertySheetDialogBuilder()
                 .title("Configure " + lookupProvider().map(SdmxFileProvider::getDisplayName).orElse(""))
-                .icon(SdmxAutoCompletion.getDefaultIcon());
+                .icon(SdmxIcons.getDefaultIcon());
         if (editor.editSheet(editable.toSheet())) {
             configuration = editable;
             updateProvider();
@@ -81,12 +83,12 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
     }
 
     @Override
-    public Config getConfig() {
+    public @lombok.NonNull Config getConfig() {
         return SdmxFileConfiguration.PERSISTENCE.loadConfig(configuration);
     }
 
     @Override
-    public void setConfig(Config config) throws IllegalArgumentException {
+    public void setConfig(@lombok.NonNull Config config) throws IllegalArgumentException {
         SdmxFileConfiguration.PERSISTENCE.storeConfig(configuration, config);
         updateProvider();
     }

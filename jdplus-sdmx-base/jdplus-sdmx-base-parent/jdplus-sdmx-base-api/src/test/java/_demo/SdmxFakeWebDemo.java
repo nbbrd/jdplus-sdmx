@@ -23,7 +23,7 @@ import jdplus.toolkit.base.tsp.DataSource;
 import sdmxdl.Feature;
 import sdmxdl.web.SdmxWebManager;
 import tests.sdmxdl.api.RepoSamples;
-import tests.sdmxdl.web.MockedDriver;
+import tests.sdmxdl.web.spi.MockedDriver;
 
 import java.io.IOException;
 import java.util.EnumSet;

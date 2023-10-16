@@ -16,23 +16,24 @@
  */
 package jdplus.sdmx.base.api.file;
 
-import jdplus.toolkit.base.api.timeseries.TsProvider;
+import internal.sdmx.base.api.SdmxCubeConnection;
+import internal.sdmx.base.api.SdmxCubeItems;
+import internal.sdmx.base.api.SdmxPropertiesSupport;
 import jdplus.sdmx.base.api.HasSdmxProperties;
+import jdplus.toolkit.base.api.timeseries.TsProvider;
 import jdplus.toolkit.base.tsp.*;
 import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
 import jdplus.toolkit.base.tsp.stream.HasTsStream;
 import jdplus.toolkit.base.tsp.stream.TsStreamAsProvider;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
-import internal.sdmx.base.api.SdmxCubeConnection;
-import internal.sdmx.base.api.SdmxCubeItems;
-import internal.sdmx.base.api.SdmxPropertiesSupport;
+import lombok.NonNull;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
-import sdmxdl.DataflowRef;
+import sdmxdl.FlowRef;
 import sdmxdl.file.SdmxFileManager;
-import sdmxdl.file.SdmxFileSource;
+import sdmxdl.file.FileSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,12 +83,12 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
     }
 
     @Override
-    public String getDisplayName() {
+    public @NonNull String getDisplayName() {
         return "SDMX Files";
     }
 
     @Override
-    public String getFileDescription() {
+    public @NonNull String getFileDescription() {
         return "SDMX file";
     }
 
@@ -97,34 +98,34 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
     }
 
     @Override
-    public String getDisplayName(DataSource dataSource) throws IllegalArgumentException {
+    public @NonNull String getDisplayName(@NonNull DataSource dataSource) throws IllegalArgumentException {
         return getSourceLabel(decodeBean(dataSource));
     }
 
     @Override
-    public String getDisplayName(DataSet dataSet) throws IllegalArgumentException {
+    public @NonNull String getDisplayName(@NonNull DataSet dataSet) throws IllegalArgumentException {
         return cubeSupport.getDisplayName(dataSet);
     }
 
     @Override
-    public String getDisplayName(IOException exception) throws IllegalArgumentException {
+    public @NonNull String getDisplayName(@NonNull IOException exception) throws IllegalArgumentException {
         return cubeSupport.getDisplayName(exception);
     }
 
     @Override
-    public String getDisplayNodeName(DataSet dataSet) throws IllegalArgumentException {
+    public @NonNull String getDisplayNodeName(@NonNull DataSet dataSet) throws IllegalArgumentException {
         return cubeSupport.getDisplayNodeName(dataSet);
     }
 
     private static CubeConnection openConnection(DataSource dataSource, HasSdmxProperties<SdmxFileManager> properties, HasFilePaths paths, SdmxFileParam param) throws IOException {
         SdmxFileBean bean = param.get(dataSource);
-        SdmxFileSource files = SdmxCubeItems.resolveFileSet(paths, bean);
+        FileSource files = SdmxCubeItems.resolveFileSet(paths, bean);
 
-        DataflowRef flow = files.asDataflowRef();
+        FlowRef flow = files.asDataflowRef();
 
-        Connection conn = properties.getSdmxManager().getConnection(files);
+        Connection conn = properties.getSdmxManager().getConnection(files, properties.getLanguages());
         try {
-            return SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), getSourceLabel(bean));
+            return SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), getSourceLabel(bean), false);
         } catch (IOException ex) {
             Resource.ensureClosed(ex, conn);
             throw ex;

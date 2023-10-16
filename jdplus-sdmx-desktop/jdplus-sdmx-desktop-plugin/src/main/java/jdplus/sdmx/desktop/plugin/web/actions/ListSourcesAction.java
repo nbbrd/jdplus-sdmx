@@ -1,21 +1,22 @@
-package jdplus.sdmx.desktop.plugin.web;
+package jdplus.sdmx.desktop.plugin.web.actions;
 
-import jdplus.toolkit.desktop.plugin.actions.AbilityNodeAction;
-import jdplus.toolkit.desktop.plugin.actions.Actions;
-import static jdplus.toolkit.desktop.plugin.tsproviders.TsProviderNodes.PROVIDER_ACTION_PATH;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.tsp.DataSourceProvider;
-import java.awt.BorderLayout;
+import jdplus.toolkit.desktop.plugin.actions.AbilityNodeAction;
+import jdplus.toolkit.desktop.plugin.actions.Actions;
 import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
-
-import java.util.stream.Stream;
-import javax.swing.JMenuItem;
-import org.openide.awt.ActionReference;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 import sdmxdl.web.SdmxWebManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.stream.Stream;
+
+import static jdplus.toolkit.desktop.plugin.tsproviders.TsProviderNodes.PROVIDER_ACTION_PATH;
 
 @ActionID(category = "Edit", id = ListSourcesAction.ID)
 @ActionRegistration(displayName = "#CTL_ListSourcesAction", lazy = false)
@@ -23,7 +24,7 @@ import sdmxdl.web.SdmxWebManager;
 @ActionReference(path = PROVIDER_ACTION_PATH, position = 530, separatorBefore = 500, id = @ActionID(category = "Edit", id = ListSourcesAction.ID))
 public final class ListSourcesAction extends AbilityNodeAction<DataSourceProvider> implements Presenter.Popup {
 
-    public static final String ID = "demetra.desktop.extra.sdmx.web.ListSourcesAction";
+    static final String ID = "jdplus.sdmx.desktop.plugin.web.actions.ListSourcesAction";
 
     public ListSourcesAction() {
         super(DataSourceProvider.class, true);
@@ -37,7 +38,7 @@ public final class ListSourcesAction extends AbilityNodeAction<DataSourceProvide
     @Override
     protected void performAction(Stream<DataSourceProvider> items) {
         items.map(SdmxWebProvider.class::cast).forEach(item -> {
-            createComponent("SdmxWebSource", item.getSdmxManager());
+            createComponent("WebSource", item.getSdmxManager());
         });
     }
 

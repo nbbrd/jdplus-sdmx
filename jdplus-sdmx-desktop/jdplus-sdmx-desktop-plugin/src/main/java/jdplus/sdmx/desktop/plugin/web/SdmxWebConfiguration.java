@@ -1,27 +1,21 @@
 package jdplus.sdmx.desktop.plugin.web;
 
-import internal.sdmx.desktop.plugin.CustomNetwork;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
+import internal.sdmx.desktop.plugin.SdmxIcons;
+import jdplus.sdmx.desktop.plugin.Toggle;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
-import jdplus.toolkit.desktop.plugin.notification.MessageUtil;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.DataRepository;
-import sdmxdl.LanguagePriorityList;
-import sdmxdl.ext.Cache;
-import sdmxdl.format.FileFormat;
-import sdmxdl.format.spi.FileFormatProvider;
-import sdmxdl.format.spi.FileFormatProviderLoader;
-import sdmxdl.format.xml.XmlWebSource;
-import sdmxdl.provider.ext.FileCache;
-import sdmxdl.provider.ext.VerboseCache;
-import sdmxdl.web.MonitorReports;
+import sdmxdl.Languages;
 import sdmxdl.web.SdmxWebManager;
-import sdmxdl.web.SdmxWebSource;
+import sdmxdl.web.WebSource;
+import standalone_sdmxdl.nbbrd.io.text.Parser;
+import standalone_sdmxdl.sdmxdl.provider.ri.caching.RiCaching;
+import standalone_sdmxdl.sdmxdl.provider.ri.drivers.SourceProperties;
+import standalone_sdmxdl.sdmxdl.provider.ri.networking.RiNetworking;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
@@ -29,7 +23,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.BiConsumer;
+import java.util.Properties;
 
 @lombok.Data
 public class SdmxWebConfiguration {
@@ -43,24 +37,28 @@ public class SdmxWebConfiguration {
     private String languages = DEFAULT_LANGUAGES;
 
     private static final String CURL_BACKEND_PROPERTY = "curlBackend";
-    private static final boolean DEFAULT_CURL_BACKEND = false;
-    private boolean curlBackend = DEFAULT_CURL_BACKEND;
+    private static final Toggle DEFAULT_CURL_BACKEND = Toggle.DEFAULT;
+    private Toggle curlBackend = DEFAULT_CURL_BACKEND;
 
     private static final String NO_CACHE_PROPERTY = "noCache";
-    private static final boolean DEFAULT_NO_CACHE = false;
-    private boolean noCache = DEFAULT_NO_CACHE;
+    private static final Toggle DEFAULT_NO_CACHE = Toggle.DEFAULT;
+    private Toggle noCache = DEFAULT_NO_CACHE;
 
     private static final String AUTO_PROXY_PROPERTY = "autoProxy";
-    private static final boolean DEFAULT_AUTO_PROXY = false;
-    private boolean autoProxy = DEFAULT_AUTO_PROXY;
+    private static final Toggle DEFAULT_AUTO_PROXY = Toggle.DEFAULT;
+    private Toggle autoProxy = DEFAULT_AUTO_PROXY;
 
     private static final String NO_DEFAULT_SSL_PROPERTY = "noDefaultSSL";
-    private static final boolean DEFAULT_NO_DEFAULT_SSL = false;
-    private boolean noDefaultSSL = DEFAULT_NO_DEFAULT_SSL;
+    private static final Toggle DEFAULT_NO_DEFAULT_SSL = Toggle.DEFAULT;
+    private Toggle noDefaultSSL = DEFAULT_NO_DEFAULT_SSL;
 
     private static final String NO_SYSTEM_SSL_PROPERTY = "noSystemSSL";
-    private static final boolean DEFAULT_NO_SYSTEM_SSL = false;
-    private boolean noSystemSSL = DEFAULT_NO_SYSTEM_SSL;
+    private static final Toggle DEFAULT_NO_SYSTEM_SSL = Toggle.DEFAULT;
+    private Toggle noSystemSSL = DEFAULT_NO_SYSTEM_SSL;
+
+    private static final String DISPLAY_CODES_PROPERTY = "displayCodes";
+    private static final boolean DEFAULT_DISPLAY_CODES = false;
+    private boolean displayCodes = DEFAULT_DISPLAY_CODES;
 
     @MightBeGenerated
     public static SdmxWebConfiguration copyOf(SdmxWebConfiguration bean) {
@@ -72,79 +70,47 @@ public class SdmxWebConfiguration {
         result.autoProxy = bean.autoProxy;
         result.noDefaultSSL = bean.noDefaultSSL;
         result.noSystemSSL = bean.noSystemSSL;
+        result.displayCodes = bean.displayCodes;
         return result;
     }
 
-    SdmxWebManager toSdmxWebManager() {
+    public SdmxWebManager toSdmxWebManager() {
+        Properties properties = System.getProperties();
+
+        curlBackend.applyTo(properties, RiNetworking.CURL_BACKEND_PROPERTY);
+        noCache.applyTo(properties, RiCaching.NO_CACHE_PROPERTY);
+        autoProxy.applyTo(properties, RiNetworking.AUTO_PROXY_PROPERTY);
+        noDefaultSSL.applyTo(properties, RiNetworking.NO_DEFAULT_SSL_PROPERTY);
+        noSystemSSL.applyTo(properties, RiNetworking.NO_SYSTEM_SSL_PROPERTY);
+
         return SdmxWebManager.ofServiceLoader()
                 .toBuilder()
-                .languages(toLanguages())
-                .eventListener(toEventListener())
-                .cache(toCache())
-                .network(toNetwork())
-                .customSources(toSources())
+                .onEvent(this::reportEvent)
+                .onError(this::reportError)
+                .customSources(getCustomSources())
                 .build();
     }
 
-    private LanguagePriorityList toLanguages() throws IllegalArgumentException {
-        return languages != null ? LanguagePriorityList.parse(languages) : LanguagePriorityList.ANY;
-    }
-
-    private BiConsumer<? super SdmxWebSource, ? super String> toEventListener() {
-        return (source, message) -> StatusDisplayer.getDefault().setStatusText(message);
-    }
-
-    private Cache toCache() {
-        if (noCache) {
-            return Cache.noOp();
+    private static List<WebSource> getCustomSources() {
+        try {
+            return SourceProperties.loadCustomSources();
+        } catch (IOException e) {
+            return Collections.emptyList();
         }
-        Cache cache = getCache(false);
-        return getVerboseCache(cache, true);
     }
 
-    private CustomNetwork toNetwork() {
-        return CustomNetwork
-                .builder()
-                .curlBackend(curlBackend)
-                .autoProxy(autoProxy)
-                .defaultTrustMaterial(!noDefaultSSL)
-                .systemTrustMaterial(!noSystemSSL)
-                .build();
+    public Languages toLanguages() {
+        return Parser.of(Languages::parse)
+                .parseValue(languages)
+                .orElse(Languages.ANY);
     }
 
-    private List<SdmxWebSource> toSources() {
-        if (sources != null && sources.exists()) {
-            try {
-                return XmlWebSource.getParser().parseFile(sources);
-            } catch (IOException ex) {
-                MessageUtil.showException("Cannot load custom sources", ex);
-            }
-        }
-        return Collections.emptyList();
+    private void reportEvent(WebSource source, String marker, CharSequence message) {
+        StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private static Cache getCache(boolean noCacheCompression) {
-        FileFormatProvider formatProvider = FileFormatProviderLoader.load().stream().findFirst().orElseThrow(RuntimeException::new);
-        FileFormat<DataRepository> repositoryFormat = formatProvider.getDataRepositoryFormat();
-        FileFormat<MonitorReports> monitorFormat = formatProvider.getMonitorReportsFormat();
-        return FileCache
-                .builder()
-                .repositoryFormat(noCacheCompression ? repositoryFormat : FileFormat.gzip(repositoryFormat))
-                .monitorFormat(noCacheCompression ? monitorFormat : FileFormat.gzip(monitorFormat))
-                .onIOException(SdmxWebConfiguration::reportIOException)
-                .build();
-    }
-
-    private static void reportIOException(String message, IOException error) {
-        NotificationDisplayer.getDefault().notify(message, SdmxAutoCompletion.getDefaultIcon(), "", null);
-    }
-
-    private static Cache getVerboseCache(Cache delegate, boolean verbose) {
-        if (verbose) {
-            BiConsumer<String, Boolean> listener = (key, hit) -> StatusDisplayer.getDefault().setStatusText((hit ? "Hit " : "Miss ") + key);
-            return new VerboseCache(delegate, listener, listener);
-        }
-        return delegate;
+    private void reportError(WebSource source, String marker, CharSequence message, IOException error) {
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
     }
 
     Sheet toSheet() {
@@ -168,27 +134,27 @@ public class SdmxWebConfiguration {
         result.put(b.build());
 
         b.reset("Network");
-        b.withBoolean()
+        b.withEnum(Toggle.class)
                 .select(this, CURL_BACKEND_PROPERTY)
                 .display("Curl backend")
                 .description("Use curl backend instead of JDK")
                 .add();
-        b.withBoolean()
+        b.withEnum(Toggle.class)
                 .select(this, NO_CACHE_PROPERTY)
                 .display("No cache")
                 .description("Disable caching")
                 .add();
-        b.withBoolean()
+        b.withEnum(Toggle.class)
                 .select(this, AUTO_PROXY_PROPERTY)
                 .display("Auto proxy")
                 .description("Enable automatic proxy detection")
                 .add();
-        b.withBoolean()
+        b.withEnum(Toggle.class)
                 .select(this, NO_DEFAULT_SSL_PROPERTY)
                 .display("No default SSL")
                 .description("Disable default truststore")
                 .add();
-        b.withBoolean()
+        b.withEnum(Toggle.class)
                 .select(this, NO_SYSTEM_SSL_PROPERTY)
                 .display("No system SSL")
                 .description("Disable system truststore")
@@ -202,13 +168,14 @@ public class SdmxWebConfiguration {
     static final Persistence<SdmxWebConfiguration> PERSISTENCE = Persistence
             .builderOf(SdmxWebConfiguration.class)
             .name("INSTANCE")
-            .version("VERSION")
+            .version("20230717")
             .with(PropertyHandler.onFile(SOURCES_PROPERTY, DEFAULT_SOURCES), SdmxWebConfiguration::getSources, SdmxWebConfiguration::setSources)
             .with(PropertyHandler.onString(LANGUAGES_PROPERTY, DEFAULT_LANGUAGES), SdmxWebConfiguration::getLanguages, SdmxWebConfiguration::setLanguages)
-            .with(PropertyHandler.onBoolean(CURL_BACKEND_PROPERTY, DEFAULT_CURL_BACKEND), SdmxWebConfiguration::isCurlBackend, SdmxWebConfiguration::setCurlBackend)
-            .with(PropertyHandler.onBoolean(NO_CACHE_PROPERTY, DEFAULT_NO_CACHE), SdmxWebConfiguration::isNoCache, SdmxWebConfiguration::setNoCache)
-            .with(PropertyHandler.onBoolean(AUTO_PROXY_PROPERTY, DEFAULT_AUTO_PROXY), SdmxWebConfiguration::isAutoProxy, SdmxWebConfiguration::setAutoProxy)
-            .with(PropertyHandler.onBoolean(NO_DEFAULT_SSL_PROPERTY, DEFAULT_NO_DEFAULT_SSL), SdmxWebConfiguration::isNoDefaultSSL, SdmxWebConfiguration::setNoDefaultSSL)
-            .with(PropertyHandler.onBoolean(NO_SYSTEM_SSL_PROPERTY, DEFAULT_NO_SYSTEM_SSL), SdmxWebConfiguration::isNoSystemSSL, SdmxWebConfiguration::setNoSystemSSL)
+            .with(PropertyHandler.onEnum(CURL_BACKEND_PROPERTY, DEFAULT_CURL_BACKEND), SdmxWebConfiguration::getCurlBackend, SdmxWebConfiguration::setCurlBackend)
+            .with(PropertyHandler.onEnum(NO_CACHE_PROPERTY, DEFAULT_NO_CACHE), SdmxWebConfiguration::getNoCache, SdmxWebConfiguration::setNoCache)
+            .with(PropertyHandler.onEnum(AUTO_PROXY_PROPERTY, DEFAULT_AUTO_PROXY), SdmxWebConfiguration::getAutoProxy, SdmxWebConfiguration::setAutoProxy)
+            .with(PropertyHandler.onEnum(NO_DEFAULT_SSL_PROPERTY, DEFAULT_NO_DEFAULT_SSL), SdmxWebConfiguration::getNoDefaultSSL, SdmxWebConfiguration::setNoDefaultSSL)
+            .with(PropertyHandler.onEnum(NO_SYSTEM_SSL_PROPERTY, DEFAULT_NO_SYSTEM_SSL), SdmxWebConfiguration::getNoSystemSSL, SdmxWebConfiguration::setNoSystemSSL)
+            .with(PropertyHandler.onBoolean(DISPLAY_CODES_PROPERTY, DEFAULT_DISPLAY_CODES), SdmxWebConfiguration::isDisplayCodes, SdmxWebConfiguration::setDisplayCodes)
             .build();
 }

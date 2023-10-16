@@ -1,19 +1,5 @@
-package jdplus.sdmx.desktop.plugin.web;
+package jdplus.sdmx.desktop.plugin.web.actions;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jdplus.toolkit.desktop.plugin.ColorSchemeManager;
-import jdplus.toolkit.desktop.plugin.TsManager;
-import jdplus.main.desktop.design.SwingAction;
-import jdplus.main.desktop.design.SwingComponent;
-import jdplus.main.desktop.design.SwingProperty;
-import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
-import jdplus.toolkit.desktop.plugin.util.ActionMaps;
-import jdplus.toolkit.desktop.plugin.util.FontAwesomeUtils;
-import jdplus.toolkit.desktop.plugin.util.InputMaps;
-import jdplus.toolkit.desktop.plugin.util.KeyStrokes;
-import jdplus.toolkit.desktop.plugin.util.ListTableModel;
-import jdplus.sdmx.base.api.web.SdmxWebBean;
-import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import ec.util.chart.ColorScheme;
 import ec.util.chart.swing.SwingColorSchemeSupport;
 import ec.util.desktop.Desktop;
@@ -21,42 +7,44 @@ import ec.util.desktop.DesktopManager;
 import ec.util.table.swing.JTables;
 import ec.util.various.swing.FontAwesome;
 import ec.util.various.swing.JCommand;
-import ec.util.various.swing.OnAnyThread;
-import ec.util.various.swing.OnEDT;
 import ec.util.various.swing.StandardSwingColor;
-import internal.sdmx.desktop.plugin.SdmxAutoCompletion;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
+import internal.sdmx.desktop.plugin.SdmxIcons;
+import jdplus.main.desktop.design.SwingAction;
+import jdplus.main.desktop.design.SwingComponent;
+import jdplus.main.desktop.design.SwingProperty;
+import jdplus.sdmx.base.api.web.SdmxWebBean;
+import jdplus.sdmx.base.api.web.SdmxWebProvider;
+import jdplus.toolkit.desktop.plugin.ColorSchemeManager;
+import jdplus.toolkit.desktop.plugin.TsManager;
+import jdplus.toolkit.desktop.plugin.concurrent.DefaultThreadFactory;
+import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceManager;
+import jdplus.toolkit.desktop.plugin.util.*;
+import nbbrd.design.swing.OnAnyThread;
+import nbbrd.design.swing.OnEDT;
+import org.netbeans.swing.etable.ETable;
+import org.openide.awt.StatusDisplayer;
+import org.openide.util.Exceptions;
+import sdmxdl.Languages;
+import sdmxdl.web.MonitorReport;
+import sdmxdl.web.MonitorStatus;
+import sdmxdl.web.SdmxWebManager;
+import sdmxdl.web.WebSource;
+import standalone_sdmxdl.nbbrd.io.text.Formatter;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.beans.BeanInfo;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.ActionMap;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableCellRenderer;
-import nbbrd.io.text.Formatter;
-import org.netbeans.swing.etable.ETable;
-import org.openide.awt.StatusDisplayer;
-import org.openide.util.Exceptions;
-import sdmxdl.LanguagePriorityList;
-import sdmxdl.web.MonitorReport;
-import sdmxdl.web.MonitorStatus;
-import sdmxdl.web.SdmxWebManager;
-import sdmxdl.web.SdmxWebSource;
 
 @SwingComponent
 public final class JSdmxWebSourcePanel extends JComponent {
@@ -81,6 +69,19 @@ public final class JSdmxWebSourcePanel extends JComponent {
 
     public void setSdmxManager(SdmxWebManager sdmxManager) {
         firePropertyChange(SDMX_MANAGER_PROPERTY, this.sdmxManager, this.sdmxManager = (sdmxManager != null ? sdmxManager : DEFAULT_SDMX_MANAGER.get()));
+    }
+
+    @SwingProperty
+    public static final String LANGUAGES_PROPERTY = "sdmxManager";
+    private static final Supplier<Languages> DEFAULT_LANGUAGES = () -> Languages.ANY;
+    private Languages languages = DEFAULT_LANGUAGES.get();
+
+    public Languages getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(Languages languages) {
+        firePropertyChange(LANGUAGES_PROPERTY, this.languages, this.languages = (languages != null ? languages : DEFAULT_LANGUAGES.get()));
     }
 
     private final ETable table;
@@ -138,7 +139,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         support = StatusSupport
                 .builder()
                 .sdmxManager(sdmxManager)
-                .executor(Executors.newCachedThreadPool(new ThreadFactoryBuilder().setDaemon(true).setPriority(Thread.MIN_PRIORITY).build()))
+                .executor(Executors.newCachedThreadPool(DefaultThreadFactory.builder().daemon(true).priority(Thread.MIN_PRIORITY).build()))
                 .cache(new HashMap<>())
                 .fallback(MonitorReport.builder().source("").status(MonitorStatus.UNKNOWN).build())
                 .build();
@@ -165,7 +166,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         support = support.toBuilder().sdmxManager(sdmxManager).build();
         ((WebSourceModel) table.getModel()).setValues(
                 sdmxManager.getSources().values().stream().filter(source -> !source.isAlias()).collect(Collectors.toList()),
-                sdmxManager.getLanguages()
+                languages
         );
     }
 
@@ -198,9 +199,9 @@ public final class JSdmxWebSourcePanel extends JComponent {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (value instanceof SdmxWebSource source) {
+                if (value instanceof WebSource source) {
                     result.setText(source.getId());
-                    result.setIcon(SdmxAutoCompletion.getFavicon(source.getWebsite(), table::repaint));
+                    result.setIcon(SdmxIcons.getFavicon(sdmxManager.getNetworking(), source.getWebsite(), table::repaint));
                 }
                 return result;
             }
@@ -214,18 +215,18 @@ public final class JSdmxWebSourcePanel extends JComponent {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (value instanceof SdmxWebSource source) {
+                if (value instanceof WebSource source) {
                     MonitorReport report = support.get(source, table::repaint);
                     result.setText("");
                     result.setToolTipText(uptimeRatioFormatter.formatAsString(report.getUptimeRatio()) + " uptime");
                     SwingColorSchemeSupport colors = ColorSchemeManager.get().getSupport(ColorSchemeManager.get().getMainColorScheme());
                     switch (report.getStatus()) {
                         case DOWN ->
-                            result.setIcon(FontAwesome.FA_TIMES_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.RED), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
+                                result.setIcon(FontAwesome.FA_TIMES_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.RED), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
                         case UNKNOWN ->
-                            result.setIcon(FontAwesome.FA_QUESTION_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.ORANGE), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
+                                result.setIcon(FontAwesome.FA_QUESTION_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.ORANGE), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
                         case UP ->
-                            result.setIcon(FontAwesome.FA_CHECK_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.GREEN), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
+                                result.setIcon(FontAwesome.FA_CHECK_CIRCLE.getIcon(colors.getAreaColor(ColorScheme.KnownColor.GREEN), FontAwesomeUtils.toSize(BeanInfo.ICON_COLOR_16x16)));
                     }
                 }
                 return result;
@@ -248,7 +249,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         private final Map<String, MonitorReport> cache;
 
         @OnEDT
-        public MonitorReport get(SdmxWebSource url, Runnable onUpdate) {
+        public MonitorReport get(WebSource url, Runnable onUpdate) {
             return url != null ? cache.computeIfAbsent(url.getId(), host -> request(url, onUpdate)) : fallback;
         }
 
@@ -258,13 +259,13 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @OnEDT
-        private MonitorReport request(SdmxWebSource url, Runnable onUpdate) {
+        private MonitorReport request(WebSource url, Runnable onUpdate) {
             executor.execute(() -> loadIntoCache(url, onUpdate));
             return fallback;
         }
 
         @OnAnyThread
-        private void loadIntoCache(SdmxWebSource url, Runnable onUpdate) {
+        private void loadIntoCache(WebSource url, Runnable onUpdate) {
             MonitorReport favicon = load(url);
             if (favicon != null) {
                 SwingUtilities.invokeLater(() -> {
@@ -275,7 +276,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @OnAnyThread
-        private MonitorReport load(SdmxWebSource url) {
+        private MonitorReport load(WebSource url) {
             report("Loading favicon for " + url.getId());
             try {
                 return sdmxManager.getMonitorReport(url);
@@ -291,12 +292,12 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
     }
 
-    private static final class WebSourceModel extends ListTableModel<SdmxWebSource> {
+    private static final class WebSourceModel extends ListTableModel<WebSource> {
 
-        private List<SdmxWebSource> values = Collections.emptyList();
-        private LanguagePriorityList languages = LanguagePriorityList.ANY;
+        private List<WebSource> values = Collections.emptyList();
+        private Languages languages = Languages.ANY;
 
-        public void setValues(List<SdmxWebSource> values, LanguagePriorityList languages) {
+        public void setValues(List<WebSource> values, Languages languages) {
             this.values = values;
             this.languages = languages;
             fireTableDataChanged();
@@ -308,12 +309,12 @@ public final class JSdmxWebSourcePanel extends JComponent {
         }
 
         @Override
-        protected List<SdmxWebSource> getValues() {
+        protected List<WebSource> getValues() {
             return values;
         }
 
         @Override
-        protected Object getValueAt(SdmxWebSource row, int columnIndex) {
+        protected Object getValueAt(WebSource row, int columnIndex) {
             switch (columnIndex) {
                 case 0:
                     return row;
@@ -336,7 +337,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
         @Override
         public void execute(JSdmxWebSourcePanel c) throws Exception {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
-            SdmxWebSource source = ((WebSourceModel) c.table.getModel()).getValues().get(idx);
+            WebSource source = ((WebSourceModel) c.table.getModel()).getValues().get(idx);
             TsManager.get().getProvider(SdmxWebProvider.class).ifPresent(provider -> {
                 SdmxWebBean bean = provider.newBean();
                 bean.setSource(source.getId());
@@ -382,7 +383,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             return super.toAction(c).withWeakListSelectionListener(c.table.getSelectionModel());
         }
 
-        private SdmxWebSource getSelection(JSdmxWebSourcePanel c) {
+        private WebSource getSelection(JSdmxWebSourcePanel c) {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
             return ((WebSourceModel) c.table.getModel()).getValues().get(idx);
         }
@@ -413,7 +414,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
             return super.toAction(c).withWeakListSelectionListener(c.table.getSelectionModel());
         }
 
-        private SdmxWebSource getSelection(JSdmxWebSourcePanel c) {
+        private WebSource getSelection(JSdmxWebSourcePanel c) {
             int idx = c.table.convertRowIndexToModel(c.table.getSelectedRow());
             return ((WebSourceModel) c.table.getModel()).getValues().get(idx);
         }

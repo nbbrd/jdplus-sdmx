@@ -16,19 +16,23 @@
  */
 package jdplus.sdmx.base.api;
 
+import lombok.NonNull;
 import nbbrd.design.ThreadSafe;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import sdmxdl.Languages;
 import sdmxdl.SdmxManager;
 
 /**
  * @author Philippe Charles
  */
 @ThreadSafe
-public interface HasSdmxProperties<M extends SdmxManager> {
+public interface HasSdmxProperties<M extends SdmxManager<?>> {
 
-    @NonNull
-    M getSdmxManager();
+    @NonNull M getSdmxManager();
 
     void setSdmxManager(@Nullable M manager);
+
+    @NonNull Languages getLanguages();
+
+    void setLanguages(@Nullable Languages languages);
 }

@@ -18,6 +18,9 @@ package internal.sdmx.base.api;
 
 import jdplus.sdmx.base.api.HasSdmxProperties;
 import lombok.AccessLevel;
+import lombok.NonNull;
+import nbbrd.io.function.IORunnable;
+import sdmxdl.Languages;
 import sdmxdl.SdmxManager;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,21 +30,25 @@ import java.util.function.Supplier;
  * @author Philippe Charles
  */
 @lombok.AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SdmxPropertiesSupport<M extends SdmxManager> implements HasSdmxProperties<M> {
+public final class SdmxPropertiesSupport<M extends SdmxManager<?>> implements HasSdmxProperties<M> {
 
-    public static <M extends SdmxManager> HasSdmxProperties<M> of(Supplier<M> defaultManager, Runnable onManagerChange) {
-        return new SdmxPropertiesSupport(
-                defaultManager,
-                new AtomicReference<>(defaultManager.get()),
-                onManagerChange);
+    public static <M extends SdmxManager<?>> HasSdmxProperties<M> of(Supplier<M> defaultManager, Runnable onManagerChange) {
+        return new SdmxPropertiesSupport<>(
+                defaultManager, new AtomicReference<>(defaultManager.get()), onManagerChange,
+                () -> Languages.ANY, new AtomicReference<>(Languages.ANY), IORunnable.noOp().asUnchecked()
+        );
     }
 
     private final Supplier<M> defaultManager;
     private final AtomicReference<M> manager;
     private final Runnable onManagerChange;
 
+    private final Supplier<Languages> defaultLanguages;
+    private final AtomicReference<Languages> languages;
+    private final Runnable onLanguagesChange;
+
     @Override
-    public M getSdmxManager() {
+    public @NonNull M getSdmxManager() {
         return manager.get();
     }
 
@@ -50,6 +57,19 @@ public final class SdmxPropertiesSupport<M extends SdmxManager> implements HasSd
         M old = this.manager.get();
         if (this.manager.compareAndSet(old, manager != null ? manager : defaultManager.get())) {
             onManagerChange.run();
+        }
+    }
+
+    @Override
+    public @NonNull Languages getLanguages() {
+        return languages.get();
+    }
+
+    @Override
+    public void setLanguages(Languages languages) {
+        Languages old = this.languages.get();
+        if (this.languages.compareAndSet(old, languages != null ? languages : defaultLanguages.get())) {
+            onLanguagesChange.run();
         }
     }
 }

@@ -1,20 +1,22 @@
 package jdplus.sdmx.desktop.plugin.file;
 
-import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
-import jdplus.toolkit.desktop.plugin.util.Caches;
-import jdplus.toolkit.desktop.plugin.util.Persistence;
+import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
-import java.time.Clock;
-import java.util.Locale;
-import java.util.function.BiConsumer;
+import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
+import jdplus.toolkit.desktop.plugin.util.Persistence;
 import nbbrd.design.MightBeGenerated;
+import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Sheet;
-import sdmxdl.LanguagePriorityList;
-import sdmxdl.ext.Cache;
+import sdmxdl.Languages;
+import sdmxdl.file.FileSource;
 import sdmxdl.file.SdmxFileManager;
-import sdmxdl.file.SdmxFileSource;
-import sdmxdl.provider.ext.MapCache;
+import sdmxdl.file.spi.FileCaching;
+import standalone_sdmxdl.nbbrd.io.text.Parser;
+import standalone_sdmxdl.sdmxdl.format.MemCachingSupport;
+
+import java.io.IOException;
+import java.util.Locale;
 
 @lombok.Data
 public class SdmxFileConfiguration {
@@ -38,29 +40,36 @@ public class SdmxFileConfiguration {
     public SdmxFileManager toSdmxFileManager() {
         return SdmxFileManager.ofServiceLoader()
                 .toBuilder()
-                .languages(toLanguages())
-                .eventListener(toEventListener())
-                .cache(toCache())
+                .onEvent(this::reportEvent)
+                .onError(this::reportError)
+                .caching(toCaching())
                 .build();
     }
 
-    private LanguagePriorityList toLanguages() throws IllegalArgumentException {
-        return languages != null ? LanguagePriorityList.parse(languages) : LanguagePriorityList.ANY;
+    public Languages toLanguages() {
+        return Parser.of(Languages::parse)
+                .parseValue(languages)
+                .orElse(Languages.ANY);
     }
 
-    private BiConsumer<? super SdmxFileSource, ? super String> toEventListener() {
-        return (source, message) -> StatusDisplayer.getDefault().setStatusText(message);
+
+    private void reportEvent(FileSource source, String marker, CharSequence message) {
+        StatusDisplayer.getDefault().setStatusText(message.toString());
     }
 
-    private Cache toCache() {
-        if (noCache) {
-            return Cache.noOp();
-        }
-        return MapCache.of(
-                Caches.softValuesCacheAsMap(),
-                Caches.softValuesCacheAsMap(),
-                Clock.systemDefaultZone()
-        );
+    private void reportError(FileSource source, String marker, CharSequence message, IOException error) {
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+    }
+
+    private FileCaching toCaching() {
+        return noCache
+                ? FileCaching.noOp()
+                : MemCachingSupport
+                .builder()
+                .id("SHARED_SOFT_MEM")
+//                .repositoriesOf(Caches.softValuesCacheAsMap())
+//                .webMonitorsOf(Caches.softValuesCacheAsMap())
+                .build();
     }
 
     Sheet toSheet() {
@@ -91,7 +100,7 @@ public class SdmxFileConfiguration {
     static final Persistence<SdmxFileConfiguration> PERSISTENCE = Persistence
             .builderOf(SdmxFileConfiguration.class)
             .name("INSTANCE")
-            .version("VERSION")
+            .version("20230717")
             .with(PropertyHandler.onString(LANGUAGES_PROPERTY, DEFAULT_LANGUAGES), SdmxFileConfiguration::getLanguages, SdmxFileConfiguration::setLanguages)
             .with(PropertyHandler.onBoolean(NO_CACHE_PROPERTY, DEFAULT_NO_CACHE), SdmxFileConfiguration::isNoCache, SdmxFileConfiguration::setNoCache)
             .build();
