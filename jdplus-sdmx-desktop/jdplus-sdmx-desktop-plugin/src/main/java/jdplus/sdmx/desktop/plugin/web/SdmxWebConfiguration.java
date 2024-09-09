@@ -21,7 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 
+@lombok.extern.java.Log
 @lombok.Data
 public class SdmxWebConfiguration {
 
@@ -57,6 +59,10 @@ public class SdmxWebConfiguration {
     private static final boolean DEFAULT_DISPLAY_CODES = false;
     private boolean displayCodes = DEFAULT_DISPLAY_CODES;
 
+    private static final String LOG_EVENTS_PROPERTY = "logEvents";
+    private static final boolean DEFAULT_LOG_EVENTS = false;
+    private boolean logEvents = DEFAULT_LOG_EVENTS;
+
     @MightBeGenerated
     public static SdmxWebConfiguration copyOf(SdmxWebConfiguration bean) {
         SdmxWebConfiguration result = new SdmxWebConfiguration();
@@ -68,6 +74,7 @@ public class SdmxWebConfiguration {
         result.noDefaultSSL = bean.noDefaultSSL;
         result.noSystemSSL = bean.noSystemSSL;
         result.displayCodes = bean.displayCodes;
+        result.logEvents = bean.logEvents;
         return result;
     }
 
@@ -95,10 +102,18 @@ public class SdmxWebConfiguration {
 
     private void reportEvent(WebSource source, String marker, CharSequence message) {
         StatusDisplayer.getDefault().setStatusText(message.toString());
+        if (logEvents) {
+            log.log(Level.INFO, () -> asLogMessage(source, marker, message));
+        }
     }
 
     private void reportError(WebSource source, String marker, CharSequence message, IOException error) {
         NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+        log.log(Level.SEVERE, error, () -> asLogMessage(source, marker, message));
+    }
+
+    private static String asLogMessage(WebSource source, String marker, CharSequence message) {
+        return "[" + source.getId() + "] (" + marker + ") " + message;
     }
 
     Sheet toSheet() {
@@ -147,6 +162,11 @@ public class SdmxWebConfiguration {
                 .display("No system SSL")
                 .description("Disable system truststore")
                 .add();
+        b.withBoolean()
+                .select(this, LOG_EVENTS_PROPERTY)
+                .display("Log events")
+                .description("Log events in IDE logs")
+                .add();
         result.put(b.build());
 
         return result;
@@ -165,5 +185,6 @@ public class SdmxWebConfiguration {
             .with(PropertyHandler.onEnum(NO_DEFAULT_SSL_PROPERTY, DEFAULT_NO_DEFAULT_SSL), SdmxWebConfiguration::getNoDefaultSSL, SdmxWebConfiguration::setNoDefaultSSL)
             .with(PropertyHandler.onEnum(NO_SYSTEM_SSL_PROPERTY, DEFAULT_NO_SYSTEM_SSL), SdmxWebConfiguration::getNoSystemSSL, SdmxWebConfiguration::setNoSystemSSL)
             .with(PropertyHandler.onBoolean(DISPLAY_CODES_PROPERTY, DEFAULT_DISPLAY_CODES), SdmxWebConfiguration::isDisplayCodes, SdmxWebConfiguration::setDisplayCodes)
+            .with(PropertyHandler.onBoolean(LOG_EVENTS_PROPERTY, DEFAULT_LOG_EVENTS), SdmxWebConfiguration::isLogEvents, SdmxWebConfiguration::setLogEvents)
             .build();
 }

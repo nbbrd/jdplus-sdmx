@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Add logging of events
+
+### Changed
+
+- Bump sdmx-dl from 3.0.0-beta.12 to [3.0.0-beta.13](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.13)
+
 ## [3.1.0] - 2023-10-16
 
 This is a feature release of SDMX extensions for JDemetra+ v3.  
