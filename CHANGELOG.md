@@ -11,6 +11,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add logging of events
 
+### Fixed
+
+- Fix sources file property in configuration
+
 ### Changed
 
 - Bump sdmx-dl from 3.0.0-beta.12 to [3.0.0-beta.13](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.13)
