@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
         <artifactId>jdplus-sdmx</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
     </parent>
 
     <artifactId>jdplus-sdmx-bom</artifactId>
@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.5.0</version>
+                <version>1.6.0</version>
                 <configuration>
                     <flattenMode>bom</flattenMode>
                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -89,7 +89,6 @@
                     <plugin>
                         <groupId>org.jreleaser</groupId>
                         <artifactId>jreleaser-maven-plugin</artifactId>
-                        <version>1.8.0</version>
                         <executions>
                             <execution>
                                 <id>release-assets</id>
