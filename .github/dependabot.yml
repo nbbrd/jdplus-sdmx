@@ -9,6 +9,7 @@ updates:
     open-pull-requests-limit: 10
     ignore:
       - dependency-name: "eu.europa.ec.joinup.sat:*"
+      - dependency-name: "org.netbeans.api:*"
   - package-ecosystem: "github-actions"
     target-branch: "develop"
     directory: "/"
