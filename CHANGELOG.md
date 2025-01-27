@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Modernize use of NIO API
+
 ## [3.2.0] - 2024-10-04
 
 This is a feature release of SDMX extensions for JDemetra+ v3.  
