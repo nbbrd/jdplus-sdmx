@@ -24,7 +24,8 @@ public class SdmxRuntimeDependenciesTest {
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmx)
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmxdl)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJavaDesktopUtil)
-                .hasSize(4);
+                .satisfies(SdmxRuntimeDependenciesTest::checkJ2html)
+                .hasSize(5);
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {
@@ -47,6 +48,14 @@ public class SdmxRuntimeDependenciesTest {
                 .has(sameVersion())
                 .extracting(GAV::getArtifactId)
                 .are(matchingPattern(compile("^java-desktop-util-(favicon)$")))
+                .hasSize(1);
+    }
+
+    private static void checkJ2html(List<? extends GAV> coordinates) {
+        assertThatGroupId(coordinates, "com.j2html")
+                .has(sameVersion())
+                .extracting(GAV::getArtifactId)
+                .are(matchingPattern(compile("^j2html$")))
                 .hasSize(1);
     }
 
