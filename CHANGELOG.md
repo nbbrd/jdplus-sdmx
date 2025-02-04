@@ -9,6 +9,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [3.3.0] - 2025-02-04
 
+This is a feature release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
+
 ### Added
 
 - Add copy path actions
