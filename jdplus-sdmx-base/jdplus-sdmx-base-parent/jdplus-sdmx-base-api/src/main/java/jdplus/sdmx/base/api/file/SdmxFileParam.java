@@ -27,6 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -47,8 +48,8 @@ interface SdmxFileParam extends DataSource.Converter<SdmxFileBean> {
         private final DataSource.Converter<SdmxFileBean> converter =
                 SdmxFileBeanHandler
                         .builder()
-                        .file(PropertyHandler.onFile("f", new File("")))
-                        .structureFile(PropertyHandler.onFile("s", new File("")))
+                        .file(PropertyHandler.onFile("f", Path.of("").toFile()))
+                        .structureFile(PropertyHandler.onFile("s", Path.of("").toFile()))
                         .dialect(PropertyHandler.onString("j", ""))
                         .dimensions(PropertyHandler.onStringList("d", Collections.emptyList(), ','))
                         .labelAttribute(PropertyHandler.onString("l", ""))
