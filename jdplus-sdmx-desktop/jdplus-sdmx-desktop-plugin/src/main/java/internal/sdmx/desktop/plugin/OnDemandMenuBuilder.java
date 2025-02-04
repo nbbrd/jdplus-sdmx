@@ -1,8 +1,9 @@
 package internal.sdmx.desktop.plugin;
 
-import j2html.TagCreator;
+import internal.Colors;
 import j2html.tags.DomContent;
 import j2html.tags.UnescapedText;
+import j2html.tags.specialized.SpanTag;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
+import java.util.Optional;
 
 import static j2html.TagCreator.*;
 
@@ -27,7 +29,7 @@ public final class OnDemandMenuBuilder {
     public static void addCopyToClipboard(JMenu menu, String textMenu, String clipboardContent) {
         JMenuItem item = menu.add(copyToClipboard(clipboardContent));
         item.setText(html(text(textMenu), SEPARATOR, preview(clipboardContent)).render());
-        item.setToolTipText(html(clipboardContent).render());
+        item.setToolTipText(clipboardContent);
     }
 
     public OnDemandMenuBuilder openFolder(String textMenu, File folder) {
@@ -38,7 +40,7 @@ public final class OnDemandMenuBuilder {
     public static void addOpenFolder(JMenu menu, String textMenu, File folder) {
         JMenuItem item = menu.add(openFolder(folder));
         item.setText(html(text(textMenu), SEPARATOR, preview(folder.getPath())).render());
-        item.setToolTipText(html(folder.getPath()).render());
+        item.setToolTipText(folder.getPath());
     }
 
     public OnDemandMenuBuilder addSeparator() {
@@ -63,12 +65,18 @@ public final class OnDemandMenuBuilder {
     }
 
     private static DomContent preview(String text) {
-        return TagCreator.span(text.length() > CHAR_LIMIT ? text.substring(0, CHAR_LIMIT) + "…" : text)
-                .withStyle("color:#0A84FF");
+        SpanTag result = span(text.length() > CHAR_LIMIT ? text.substring(0, CHAR_LIMIT - 1) + "…" : text);
+        return getPreviewColorAsHexString()
+                .map(color -> result.withStyle("color:" + color))
+                .orElse(result);
+    }
+
+    private static Optional<String> getPreviewColorAsHexString() {
+        return Optional.ofNullable(UIManager.getColor("MenuItem.acceleratorForeground")).map(Colors::toHex);
     }
 
     private static final int CHAR_LIMIT = 30;
-    private static final UnescapedText SEPARATOR = rawHtml("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+    private static final UnescapedText SEPARATOR = rawHtml("&emsp;⇒&emsp;");
 
     private static AbstractAction copyToClipboard(String text) {
         return new AbstractAction() {
