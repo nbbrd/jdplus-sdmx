@@ -16,6 +16,7 @@
  */
 package jdplus.sdmx.base.api.file;
 
+import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.base.api.SdmxCubeConnection;
 import internal.sdmx.base.api.SdmxCubeItems;
 import internal.sdmx.base.api.SdmxPropertiesSupport;
@@ -32,8 +33,8 @@ import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
 import sdmxdl.FlowRef;
-import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.FileSource;
+import sdmxdl.file.SdmxFileManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,7 +126,7 @@ public final class SdmxFileProvider implements FileLoader<SdmxFileBean>, HasSdmx
 
         Connection conn = properties.getSdmxManager().getConnection(files, properties.getLanguages());
         try {
-            return SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), getSourceLabel(bean), false);
+            return SdmxCubeConnection.of(conn, SdmxBeans.getDatabase(bean), flow, bean.getDimensions(), bean.getLabelAttribute(), getSourceLabel(bean), false);
         } catch (IOException ex) {
             Resource.ensureClosed(ex, conn);
             throw ex;
