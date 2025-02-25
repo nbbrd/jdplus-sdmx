@@ -16,6 +16,7 @@
  */
 package jdplus.sdmx.base.api.web;
 
+import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.base.api.SdmxCubeConnection;
 import internal.sdmx.base.api.SdmxPropertiesSupport;
 import jdplus.sdmx.base.api.HasSdmxProperties;
@@ -26,8 +27,8 @@ import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
 import jdplus.toolkit.base.tsp.stream.HasTsStream;
 import jdplus.toolkit.base.tsp.stream.TsStreamAsProvider;
-import jdplus.toolkit.base.tsp.util.ShortLivedCachingLoader;
 import jdplus.toolkit.base.tsp.util.ResourcePool;
+import jdplus.toolkit.base.tsp.util.ShortLivedCachingLoader;
 import nbbrd.io.Resource;
 import nbbrd.service.ServiceProvider;
 import sdmxdl.Connection;
@@ -103,7 +104,7 @@ public final class SdmxWebProvider implements DataSourceLoader<SdmxWebBean>, Has
 
         Connection conn = properties.getSdmxManager().getConnection(bean.getSource(), properties.getLanguages());
         try {
-            CubeConnection result = SdmxCubeConnection.of(conn, flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource(), displayCodes);
+            CubeConnection result = SdmxCubeConnection.of(conn, SdmxBeans.getDatabase(bean), flow, bean.getDimensions(), bean.getLabelAttribute(), bean.getSource(), displayCodes);
             return BulkCubeConnection.of(result, bean.getCache(), ShortLivedCachingLoader.get());
         } catch (IOException ex) {
             Resource.ensureClosed(ex, conn);

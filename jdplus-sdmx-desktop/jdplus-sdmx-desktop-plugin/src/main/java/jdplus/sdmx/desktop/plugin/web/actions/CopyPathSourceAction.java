@@ -1,6 +1,6 @@
 package jdplus.sdmx.desktop.plugin.web.actions;
 
-import internal.sdmx.desktop.plugin.CatalogRef;
+import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.desktop.plugin.OnDemandMenuBuilder;
 import internal.sdmx.desktop.plugin.SdmxCommand;
 import internal.sdmx.desktop.plugin.SdmxURI;
@@ -15,6 +15,7 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
+import sdmxdl.DatabaseRef;
 import sdmxdl.FlowRef;
 import sdmxdl.Key;
 
@@ -49,16 +50,16 @@ public final class CopyPathSourceAction extends AbilityNodeAction<DataSource> im
         DataSource item = single(items).orElseThrow(NoSuchElementException::new);
         SdmxWebProvider provider = providerOf(item).orElseThrow(NoSuchElementException::new);
         SdmxWebBean bean = provider.decodeBean(item);
+        DatabaseRef databaseRef = SdmxBeans.getDatabase(bean);
         FlowRef flowRef = FlowRef.parse(bean.getFlow());
-        CatalogRef catalog = CatalogRef.NO_CATALOG;
         new OnDemandMenuBuilder()
-                .copyToClipboard("SDMX-DL URI", SdmxURI.dataSourceURI(bean.getSource(), flowRef, catalog))
+                .copyToClipboard("SDMX-DL URI", SdmxURI.dataSourceURI(bean.getSource(), flowRef, databaseRef))
                 .copyToClipboard("Source", bean.getSource())
                 .copyToClipboard("Flow", flowRef.toString())
                 .addSeparator()
-                .copyToClipboard("List dimensions command", SdmxCommand.listDimensions(catalog, bean.getSource(), flowRef))
-                .copyToClipboard("List attributes command", SdmxCommand.listAttributes(catalog, bean.getSource(), flowRef))
-                .copyToClipboard("Fetch all keys command", SdmxCommand.fetchKeys(catalog, bean.getSource(), bean.getFlow(), Key.ALL))
+                .copyToClipboard("List dimensions command", SdmxCommand.listDimensions(databaseRef, bean.getSource(), flowRef))
+                .copyToClipboard("List attributes command", SdmxCommand.listAttributes(databaseRef, bean.getSource(), flowRef))
+                .copyToClipboard("Fetch all keys command", SdmxCommand.fetchKeys(databaseRef, bean.getSource(), bean.getFlow(), Key.ALL))
                 .showMenuAsPopup(null);
     }
 

@@ -46,14 +46,15 @@ import java.util.stream.Stream;
 @lombok.RequiredArgsConstructor
 public final class SdmxCubeConnection implements CubeConnection {
 
-    public static SdmxCubeConnection of(Connection connection, FlowRef ref, List<String> dimensions, String labelAttribute, String sourceLabel, boolean displayCodes) throws IOException {
-        Flow flow = connection.getFlow(ref);
-        Structure dsd = connection.getStructure(ref);
+    public static SdmxCubeConnection of(Connection connection, DatabaseRef databaseRef, FlowRef flowRef, List<String> dimensions, String labelAttribute, String sourceLabel, boolean displayCodes) throws IOException {
+        Flow flow = connection.getFlow(databaseRef, flowRef);
+        Structure dsd = connection.getStructure(databaseRef, flowRef);
         CubeId root = getOrLoadRoot(dimensions, dsd);
-        return new SdmxCubeConnection(connection, flow, dsd, root, labelAttribute, sourceLabel, displayCodes);
+        return new SdmxCubeConnection(connection, databaseRef, flow, dsd, root, labelAttribute, sourceLabel, displayCodes);
     }
 
     private final Connection connection;
+    private final DatabaseRef database;
     private final Flow flow;
     private final Structure dsd;
     private final CubeId root;
@@ -80,7 +81,7 @@ public final class SdmxCubeConnection implements CubeConnection {
     public @NonNull Stream<CubeSeries> getAllSeries(@NonNull CubeId ref) throws IOException {
         KeyConverter converter = KeyConverter.of(dsd, ref);
         return SdmxCubeUtil
-                .getAllSeries(connection, flow.getRef(), converter.toKey(ref))
+                .getAllSeries(connection, database, flow.getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesOf(converter, series, labelAttribute));
     }
 
@@ -88,7 +89,7 @@ public final class SdmxCubeConnection implements CubeConnection {
     public @NonNull Stream<CubeSeriesWithData> getAllSeriesWithData(@NonNull CubeId ref) throws IOException {
         KeyConverter converter = KeyConverter.of(dsd, ref);
         return SdmxCubeUtil
-                .getAllSeriesWithData(connection, flow.getRef(), converter.toKey(ref))
+                .getAllSeriesWithData(connection, database, flow.getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesWithDataOf(converter, series, labelAttribute));
     }
 
@@ -96,7 +97,7 @@ public final class SdmxCubeConnection implements CubeConnection {
     public @NonNull Optional<CubeSeries> getSeries(@NonNull CubeId id) throws IOException {
         KeyConverter converter = KeyConverter.of(dsd, id);
         return SdmxCubeUtil
-                .getSeries(connection, flow.getRef(), converter.toKey(id))
+                .getSeries(connection, database, flow.getRef(), converter.toKey(id))
                 .map(series -> cubeSeriesOf(converter, series, labelAttribute));
     }
 
@@ -104,7 +105,7 @@ public final class SdmxCubeConnection implements CubeConnection {
     public @NonNull Optional<CubeSeriesWithData> getSeriesWithData(@NonNull CubeId ref) throws IOException {
         KeyConverter converter = KeyConverter.of(dsd, ref);
         return SdmxCubeUtil
-                .getSeriesWithData(connection, flow.getRef(), converter.toKey(ref))
+                .getSeriesWithData(connection, database, flow.getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesWithDataOf(converter, series, labelAttribute));
     }
 
@@ -114,7 +115,7 @@ public final class SdmxCubeConnection implements CubeConnection {
         String dimensionId = ref.getDimensionId(ref.getLevel());
         int dimensionIndex = SdmxCubeUtil.getDimensionIndexById(dsd, dimensionId).orElseThrow(RuntimeException::new);
         return SdmxCubeUtil
-                .getChildren(connection, flow.getRef(), converter.toKey(ref), dimensionIndex)
+                .getChildren(connection, database, flow.getRef(), converter.toKey(ref), dimensionIndex)
                 .sorted()
                 .map(ref::child);
     }

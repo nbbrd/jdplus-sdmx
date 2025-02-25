@@ -1,6 +1,6 @@
 package jdplus.sdmx.desktop.plugin.web.actions;
 
-import internal.sdmx.desktop.plugin.CatalogRef;
+import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.desktop.plugin.OnDemandMenuBuilder;
 import internal.sdmx.desktop.plugin.SdmxCommand;
 import internal.sdmx.desktop.plugin.SdmxURI;
@@ -17,10 +17,7 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
-import sdmxdl.Connection;
-import sdmxdl.FlowRef;
-import sdmxdl.Key;
-import sdmxdl.Structure;
+import sdmxdl.*;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -57,18 +54,18 @@ public final class CopyPathSetAction extends AbilityNodeAction<DataSet> implemen
         DataSet item = single(items).orElseThrow(NoSuchElementException::new);
         SdmxWebProvider provider = providerOf(item.getDataSource()).orElseThrow(NoSuchElementException::new);
         SdmxWebBean bean = provider.decodeBean(item.getDataSource());
+        DatabaseRef databaseRef = SdmxBeans.getDatabase(bean);
         FlowRef flowRef = FlowRef.parse(bean.getFlow());
-        Key key = getKey(provider, bean.getSource(), flowRef, item);
-        CatalogRef catalog = CatalogRef.NO_CATALOG;
+        Key key = getKey(provider, bean.getSource(), databaseRef, flowRef, item);
         new OnDemandMenuBuilder()
-                .copyToClipboard("SDMX-DL URI", SdmxURI.dataSetURI(bean.getSource(), flowRef, key, catalog))
+                .copyToClipboard("SDMX-DL URI", SdmxURI.dataSetURI(bean.getSource(), flowRef, key, databaseRef))
                 .copyToClipboard("Source", bean.getSource())
                 .copyToClipboard("Flow", flowRef.toString())
                 .copyToClipboard("Key", key.toString())
                 .addSeparator()
-                .copyToClipboard("Fetch data command", SdmxCommand.fetchData(catalog, bean.getSource(), flowRef.toString(), key))
-                .copyToClipboard("Fetch meta command", SdmxCommand.fetchMeta(catalog, bean.getSource(), flowRef.toString(), key))
-                .copyToClipboard("Fetch keys command", SdmxCommand.fetchKeys(catalog, bean.getSource(), flowRef.toString(), key))
+                .copyToClipboard("Fetch data command", SdmxCommand.fetchData(databaseRef, bean.getSource(), flowRef.toString(), key))
+                .copyToClipboard("Fetch meta command", SdmxCommand.fetchMeta(databaseRef, bean.getSource(), flowRef.toString(), key))
+                .copyToClipboard("Fetch keys command", SdmxCommand.fetchKeys(databaseRef, bean.getSource(), flowRef.toString(), key))
                 .showMenuAsPopup(null);
     }
 
@@ -92,9 +89,9 @@ public final class CopyPathSetAction extends AbilityNodeAction<DataSet> implemen
         return list.size() == 1 ? Optional.of(list.get(0)) : Optional.empty();
     }
 
-    private static Key getKey(SdmxWebProvider provider, String source, FlowRef flowRef, DataSet dataSet) {
+    private static Key getKey(SdmxWebProvider provider, String source, DatabaseRef databaseRef, FlowRef flowRef, DataSet dataSet) {
         try (Connection connection = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
-            Structure structure = connection.getStructure(flowRef);
+            Structure structure = connection.getStructure(databaseRef, flowRef);
             Key.Builder result = Key.builder(structure);
             structure.getDimensions().forEach(dimension -> result.put(dimension.getId(), dataSet.getParameter(dimension.getId())));
             return result.build();
