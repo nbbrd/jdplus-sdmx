@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Migrate OSSRH to Central Portal
+
 ## [3.3.0] - 2025-02-04
 
 This is a feature release of SDMX extensions for JDemetra+ v3.  
