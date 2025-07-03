@@ -152,6 +152,7 @@
                                     <sourceBindings>eu.europa.ec.joinup.sat,com.github.nbbrd.sdmx-dl</sourceBindings>
                                     <sourceLimits>3,3</sourceLimits>
                                     <target>${project.baseUri}/../</target>
+                                    <logErrors>true</logErrors>
                                 </configuration>
                             </execution>
                         </executions>
