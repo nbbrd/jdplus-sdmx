@@ -12,9 +12,9 @@
     <artifactId>jdplus-sdmx-desktop-plugin</artifactId>
     <packaging>nbm</packaging>
 
-    <name>${project.artifactId}</name>
-    <description>${project.parent.artifactId} - ${project.artifactId}</description>
-    <url>${project.parent.url}</url>
+    <name>jdplus-sdmx-desktop-plugin</name>
+    <description>jdplus-sdmx-desktop - jdplus-sdmx-desktop-plugin</description>
+    <url>https://github.com/${x.github.user}/${x.github.repo}</url>
 
     <dependencies>
         <!-- 1. NetBeans Platform -->
