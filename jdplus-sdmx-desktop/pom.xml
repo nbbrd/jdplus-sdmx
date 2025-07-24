@@ -6,13 +6,15 @@
     <parent>
         <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
         <artifactId>jdplus-sdmx</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
     </parent>
 
     <artifactId>jdplus-sdmx-desktop</artifactId>
     <packaging>pom</packaging>
 
     <name>jdplus-sdmx-desktop</name>
+    <description>${project.parent.artifactId} - ${project.artifactId}</description>
+    <url>${project.parent.url}</url>
 
     <properties>
         <!-- dependencies -->
@@ -30,7 +32,7 @@
                 <plugin>
                     <groupId>org.apache.netbeans.utilities</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>14.2</version>
+                    <version>14.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -41,6 +43,8 @@
                 <configuration>
                     <!-- Force lookup of annotation processors in classpath by resetting paths -->
                     <annotationProcessorPaths combine.self="override"/>
+                    <!-- Explicit request to search for annotation processors in classpath (since JDK23) -->
+                    <proc>full</proc>
                 </configuration>
             </plugin>
             <plugin>

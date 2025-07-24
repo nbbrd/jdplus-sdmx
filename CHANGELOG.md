@@ -7,7 +7,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.3.1] - 2025-07-24
+
+This is a bugfix release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
+
+### Changed
+
+- Migrate OSSRH to Central Portal
+- Bump sdmx-dl from 3.0.0-beta.13 to [3.0.0-beta.14](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.14)
+- Bump java-desktop-util-favicon from 2.4.0 to [2.5.0](https://github.com/nbbrd/java-desktop-util/releases/tag/v2.5.0)
+
 ## [3.3.0] - 2025-02-04
+
+This is a feature release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
 
 ### Added
 
@@ -57,7 +71,8 @@ This is a feature release of SDMX extensions for JDemetra+ v3.
 This is the **initial release** of SDMX extensions for JDemetra+ v3.  
 [JDemetra+ v3.0.2 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
 
-[Unreleased]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.0...HEAD
+[Unreleased]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.1...HEAD
+[3.3.1]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.0.0...v3.1.0

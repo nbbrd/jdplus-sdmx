@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
         <artifactId>jdplus-sdmx</artifactId>
-        <version>3.3.0</version>
+        <version>3.3.1</version>
     </parent>
 
     <artifactId>jdplus-sdmx-bom</artifactId>
@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <configuration>
                     <flattenMode>bom</flattenMode>
                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -80,6 +80,7 @@
                                 </goals>
                                 <configuration>
                                     <inputFile>${project.parent.basedir}/CHANGELOG.md</inputFile>
+                                    <outputFile>${project.build.directory}/CHANGELOG.md</outputFile>
                                 </configuration>
                             </execution>
                         </executions>
@@ -121,6 +122,37 @@
                                             </artifacts>
                                         </files>
                                     </jreleaser>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>check-compatibility</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.nbbrd.nbbrd-maven-tools</groupId>
+                        <artifactId>compatibility-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check-upstream</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>https://github.com/jdemetra/jdplus-main</source>
+                                        <source>https://github.com/nbbrd/sdmx-dl</source>
+                                    </sources>
+                                    <sourceBindings>eu.europa.ec.joinup.sat,com.github.nbbrd.sdmx-dl</sourceBindings>
+                                    <sourceLimits>3,3</sourceLimits>
+                                    <target>${project.baseUri}/../</target>
+                                    <logErrors>true</logErrors>
                                 </configuration>
                             </execution>
                         </executions>
