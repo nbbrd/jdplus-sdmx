@@ -7,6 +7,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+This is a bugfix release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
+
 ### Changed
 
 - Migrate OSSRH to Central Portal
