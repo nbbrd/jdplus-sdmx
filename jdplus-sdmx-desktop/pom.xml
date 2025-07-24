@@ -13,6 +13,8 @@
     <packaging>pom</packaging>
 
     <name>jdplus-sdmx-desktop</name>
+    <description>${project.parent.artifactId} - ${project.artifactId}</description>
+    <url>${project.parent.url}</url>
 
     <properties>
         <!-- dependencies -->
