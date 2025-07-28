@@ -18,7 +18,7 @@ package jdplus.sdmx.base.api;
 
 import lombok.NonNull;
 import nbbrd.design.ThreadSafe;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import sdmxdl.Languages;
 import sdmxdl.SdmxManager;
 

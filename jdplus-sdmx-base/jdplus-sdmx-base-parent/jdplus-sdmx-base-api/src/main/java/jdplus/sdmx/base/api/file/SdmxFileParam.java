@@ -22,8 +22,8 @@ import jdplus.toolkit.base.tsp.cube.CubeConnection;
 import jdplus.toolkit.base.tsp.cube.CubeId;
 import jdplus.toolkit.base.tsp.cube.CubeSupport;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import lombok.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
