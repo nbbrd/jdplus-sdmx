@@ -13,7 +13,6 @@ import sdmxdl.web.WebSource;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -77,7 +76,7 @@ class SdmxWebBeanSupport {
                 .source(dimension.getSource())
                 .cellRenderer(dimension.getRenderer())
                 .separator(",")
-                .defaultValueSupplier(() -> dimension.getSource().getValues("").stream().map(Dimension.class::cast).sorted(Comparator.comparingInt(Dimension::getPosition)).map(Dimension::getId).collect(Collectors.joining(",")))
+                .defaultValueSupplier(() -> dimension.getSource().getValues("").stream().map(Dimension.class::cast).map(Dimension::getId).collect(Collectors.joining(",")))
                 .display(Bundle.bean_dimensions_display())
                 .description(Bundle.bean_dimensions_description())
                 .add();

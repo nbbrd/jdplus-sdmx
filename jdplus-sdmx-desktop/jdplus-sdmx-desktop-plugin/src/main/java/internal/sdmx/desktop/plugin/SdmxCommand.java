@@ -1,8 +1,9 @@
 package internal.sdmx.desktop.plugin;
 
 import sdmxdl.DatabaseRef;
-import sdmxdl.FlowRef;
+import sdmxdl.FlowRequest;
 import sdmxdl.Key;
+import sdmxdl.KeyRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -42,28 +43,28 @@ public class SdmxCommand {
         }
     }
 
-    public static String of(DatabaseRef databaseRef, String... parameters) {
-        return builderOf(databaseRef).parameters(asList(parameters)).build().toText();
+    public static String of(DatabaseRef database, String... parameters) {
+        return builderOf(database).parameters(asList(parameters)).build().toText();
     }
 
-    public static String fetchData(DatabaseRef databaseRef, String source, String flow, Key key) {
-        return of(databaseRef, "fetch", "data", source, flow, toCommandParameter(key));
+    public static String fetchData(String source, KeyRequest request) {
+        return of(request.getDatabase(), "fetch", "data", source, request.getFlow().toString(), toCommandParameter(request.getKey()));
     }
 
-    public static String fetchMeta(DatabaseRef databaseRef, String source, String flow, Key key) {
-        return of(databaseRef, "fetch", "meta", source, flow, toCommandParameter(key));
+    public static String fetchMeta(String source, KeyRequest request) {
+        return of(request.getDatabase(), "fetch", "meta", source, request.getFlow().toString(), toCommandParameter(request.getKey()));
     }
 
-    public static String fetchKeys(DatabaseRef databaseRef, String source, String flow, Key key) {
-        return of(databaseRef, "fetch", "keys", source, flow, toCommandParameter(key));
+    public static String fetchKeys(String source, KeyRequest request) {
+        return of(request.getDatabase(), "fetch", "keys", source, request.getFlow().toString(), toCommandParameter(request.getKey()));
     }
 
-    public static String listDimensions(DatabaseRef databaseRef, String source, FlowRef flow) {
-        return of(databaseRef, "list", "dimensions", source, flow.toString());
+    public static String listDimensions(String source, FlowRequest request) {
+        return of(request.getDatabase(), "list", "dimensions", source, request.getFlow().toString());
     }
 
-    public static String listAttributes(DatabaseRef databaseRef, String source, FlowRef flow) {
-        return of(databaseRef, "list", "attributes", source, flow.toString());
+    public static String listAttributes(String source, FlowRequest request) {
+        return of(request.getDatabase(), "list", "attributes", source, request.getFlow().toString());
     }
 
     private static String toCommandParameter(Key key) {

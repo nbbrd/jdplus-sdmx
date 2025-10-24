@@ -29,13 +29,13 @@ import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.toolkit.desktop.plugin.actions.Configurable;
 import jdplus.toolkit.desktop.plugin.properties.PropertySheetDialogBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceProviderBuddy;
+import lombok.NonNull;
 import nbbrd.design.DirectImpl;
 import nbbrd.service.ServiceProvider;
-import lombok.NonNull;
 import org.openide.nodes.Sheet;
 import org.openide.util.ImageUtilities;
-import sdmxdl.Connection;
 import sdmxdl.Feature;
+import sdmxdl.SourceRequest;
 import sdmxdl.web.WebSource;
 
 import java.awt.*;
@@ -151,8 +151,15 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private static boolean supportsDataQueryDetail(SdmxWebProvider provider, WebSource source) {
-        try (Connection conn = provider.getSdmxManager().getConnection(source, provider.getLanguages())) {
-            return conn.getSupportedFeatures().contains(Feature.DATA_QUERY_DETAIL);
+        try {
+            return provider
+                    .getSdmxManager()
+                    .using(source)
+                    .getSupportedFeatures(SourceRequest
+                            .builder()
+                            .languages(provider.getLanguages())
+                            .build())
+                    .contains(Feature.DATA_QUERY_DETAIL);
         } catch (IOException ex) {
             return false;
         }
