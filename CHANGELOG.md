@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+This is a bugfix release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
+
+### Changed
+
+- Bump sdmx-dl from 3.0.0-beta.14 to [3.0.0-beta.16](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.16)
+
 ## [3.3.1] - 2025-07-24
 
 This is a bugfix release of SDMX extensions for JDemetra+ v3.  
