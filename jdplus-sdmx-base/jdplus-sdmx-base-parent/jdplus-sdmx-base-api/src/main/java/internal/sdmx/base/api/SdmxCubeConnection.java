@@ -47,16 +47,14 @@ import java.util.stream.Stream;
 public final class SdmxCubeConnection implements CubeConnection {
 
     public static SdmxCubeConnection of(Connection connection, DatabaseRef databaseRef, FlowRef flowRef, List<String> dimensions, String labelAttribute, String sourceLabel, boolean displayCodes) throws IOException {
-        Flow flow = connection.getFlow(databaseRef, flowRef);
-        Structure dsd = connection.getStructure(databaseRef, flowRef);
-        CubeId root = getOrLoadRoot(dimensions, dsd);
-        return new SdmxCubeConnection(connection, databaseRef, flow, dsd, root, labelAttribute, sourceLabel, displayCodes);
+        MetaSet meta = connection.getMeta(databaseRef, flowRef);
+        CubeId root = getOrLoadRoot(dimensions, meta.getStructure());
+        return new SdmxCubeConnection(connection, databaseRef, meta, root, labelAttribute, sourceLabel, displayCodes);
     }
 
     private final Connection connection;
     private final DatabaseRef database;
-    private final Flow flow;
-    private final Structure dsd;
+    private final MetaSet meta;
     private final CubeId root;
     private final String labelAttribute;
     private final String sourceLabel;
@@ -79,50 +77,50 @@ public final class SdmxCubeConnection implements CubeConnection {
 
     @Override
     public @NonNull Stream<CubeSeries> getAllSeries(@NonNull CubeId ref) throws IOException {
-        KeyConverter converter = KeyConverter.of(dsd, ref);
+        KeyConverter converter = KeyConverter.of(meta.getStructure(), ref);
         return SdmxCubeUtil
-                .getAllSeries(connection, database, flow.getRef(), converter.toKey(ref))
+                .getAllSeries(connection, database, meta.getFlow().getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesOf(converter, series, labelAttribute));
     }
 
     @Override
     public @NonNull Stream<CubeSeriesWithData> getAllSeriesWithData(@NonNull CubeId ref) throws IOException {
-        KeyConverter converter = KeyConverter.of(dsd, ref);
+        KeyConverter converter = KeyConverter.of(meta.getStructure(), ref);
         return SdmxCubeUtil
-                .getAllSeriesWithData(connection, database, flow.getRef(), converter.toKey(ref))
+                .getAllSeriesWithData(connection, database, meta.getFlow().getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesWithDataOf(converter, series, labelAttribute));
     }
 
     @Override
     public @NonNull Optional<CubeSeries> getSeries(@NonNull CubeId id) throws IOException {
-        KeyConverter converter = KeyConverter.of(dsd, id);
+        KeyConverter converter = KeyConverter.of(meta.getStructure(), id);
         return SdmxCubeUtil
-                .getSeries(connection, database, flow.getRef(), converter.toKey(id))
+                .getSeries(connection, database, meta.getFlow().getRef(), converter.toKey(id))
                 .map(series -> cubeSeriesOf(converter, series, labelAttribute));
     }
 
     @Override
     public @NonNull Optional<CubeSeriesWithData> getSeriesWithData(@NonNull CubeId ref) throws IOException {
-        KeyConverter converter = KeyConverter.of(dsd, ref);
+        KeyConverter converter = KeyConverter.of(meta.getStructure(), ref);
         return SdmxCubeUtil
-                .getSeriesWithData(connection, database, flow.getRef(), converter.toKey(ref))
+                .getSeriesWithData(connection, database, meta.getFlow().getRef(), converter.toKey(ref))
                 .map(series -> cubeSeriesWithDataOf(converter, series, labelAttribute));
     }
 
     @Override
     public @NonNull Stream<CubeId> getChildren(@NonNull CubeId ref) throws IOException {
-        KeyConverter converter = KeyConverter.of(dsd, ref);
+        KeyConverter converter = KeyConverter.of(meta.getStructure(), ref);
         String dimensionId = ref.getDimensionId(ref.getLevel());
-        int dimensionIndex = SdmxCubeUtil.getDimensionIndexById(dsd, dimensionId).orElseThrow(RuntimeException::new);
+        int dimensionIndex = SdmxCubeUtil.getDimensionIndexById(meta.getStructure(), dimensionId).orElseThrow(RuntimeException::new);
         return SdmxCubeUtil
-                .getChildren(connection, database, flow.getRef(), converter.toKey(ref), dimensionIndex)
+                .getChildren(connection, database, meta.getFlow().getRef(), converter.toKey(ref), dimensionIndex)
                 .sorted()
                 .map(ref::child);
     }
 
     @Override
     public @NonNull String getDisplayName() {
-        return String.format(Locale.ROOT, "%s ~ %s", sourceLabel, flow.getName());
+        return String.format(Locale.ROOT, "%s ~ %s", sourceLabel, meta.getFlow().getName());
     }
 
     @Override
@@ -130,7 +128,7 @@ public final class SdmxCubeConnection implements CubeConnection {
         if (id.isVoid()) {
             return "All";
         }
-        return getKey(dsd, id).toString();
+        return getKey(meta.getStructure(), id).toString();
     }
 
     @Override
@@ -140,7 +138,7 @@ public final class SdmxCubeConnection implements CubeConnection {
         }
         return displayCodes
                 ? getDimensionCodeId(id)
-                : getDimensionCodeLabel(id, dsd);
+                : getDimensionCodeLabel(id, meta.getStructure());
     }
 
     @Override

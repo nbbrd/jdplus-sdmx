@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
         <artifactId>jdplus-sdmx-base-parent</artifactId>
-        <version>3.3.1</version>
+        <version>3.3.2</version>
     </parent>
 
     <artifactId>jdplus-sdmx-base-api</artifactId>

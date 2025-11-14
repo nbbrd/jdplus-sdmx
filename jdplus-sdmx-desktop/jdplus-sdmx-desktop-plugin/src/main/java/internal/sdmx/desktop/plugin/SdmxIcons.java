@@ -6,7 +6,7 @@ import nbbrd.desktop.favicon.DomainName;
 import nbbrd.desktop.favicon.FaviconRef;
 import nbbrd.desktop.favicon.FaviconSupport;
 import nbbrd.desktop.favicon.URLConnectionFactory;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.openide.util.ImageUtilities;
 import sdmxdl.web.WebSource;
 import sdmxdl.web.spi.Network;
