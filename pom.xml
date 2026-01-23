@@ -6,7 +6,7 @@
 
     <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
     <artifactId>jdplus-sdmx</artifactId>
-    <version>3.3.2</version>
+    <version>3.3.3</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -33,16 +33,17 @@
     <scm>
         <connection>scm:git:git://github.com/${x.github.user}/${x.github.repo}.git</connection>
         <developerConnection>scm:git:ssh://github.com:${x.github.user}/${x.github.repo}.git</developerConnection>
-        <url>http://github.com/${x.github.user}/${x.github.repo}/tree/master</url>
+        <url>https://github.com/${x.github.user}/${x.github.repo}/tree/master</url>
     </scm>
 
     <properties>
         <!-- Java 17 config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2025-11-14T06:58:17Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-01-23T10:34:10Z</project.build.outputTimestamp>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.release>17</maven.compiler.release>
+        <requiredMavenVersion>3.9.11</requiredMavenVersion>
 
         <!-- GitHub hosting -->
         <x.github.user>nbbrd</x.github.user>
@@ -55,13 +56,13 @@
         <jspecify.version>1.0.0</jspecify.version>
 
         <!-- test frameworks -->
-        <junit.version>6.0.1</junit.version>
+        <junit.version>6.0.2</junit.version>
         <assertj-core.version>3.27.6</assertj-core.version>
 
         <!-- dependencies -->
         <jdplus-main.version>3.1.1</jdplus-main.version>
         <jdplus-main-netbeans.version>RELEASE190</jdplus-main-netbeans.version>
-        <sdmx-dl.version>3.0.0-beta.16</sdmx-dl.version>
+        <sdmx-dl.version>3.0.0-beta.17</sdmx-dl.version>
     </properties>
 
     <modules>
@@ -140,12 +141,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -191,7 +192,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -206,12 +207,12 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.9.0</version>
+                    <version>0.10.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jreleaser</groupId>
                     <artifactId>jreleaser-maven-plugin</artifactId>
-                    <version>1.21.0</version>
+                    <version>1.22.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -298,7 +299,7 @@
                                 <dependencyConvergence/>
                                 <reactorModuleConvergence/>
                                 <requireMavenVersion>
-                                    <version>3.6.0</version>
+                                    <version>${requiredMavenVersion}</version>
                                 </requireMavenVersion>
                                 <requireNoRepositories>
                                     <allowedRepositories>central</allowedRepositories>
@@ -505,6 +506,18 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Skip all checks for local builds -->
+        <profile>
+            <id>yolo</id>
+            <properties>
+                <enforcer.skip>true</enforcer.skip>
+                <modernizer.skip>true</modernizer.skip>
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+                <jacoco.skip>true</jacoco.skip>
+                <heylogs.skip>true</heylogs.skip>
+            </properties>
         </profile>
     </profiles>
 
