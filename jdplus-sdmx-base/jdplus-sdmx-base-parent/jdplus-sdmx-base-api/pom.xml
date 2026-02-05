@@ -44,6 +44,12 @@
             <artifactId>jdplus-toolkit-base-tspbridge</artifactId>
             <version>${jdplus-main.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.nbbrd.sdmx-dl</groupId>
