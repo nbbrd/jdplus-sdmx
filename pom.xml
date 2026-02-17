@@ -6,7 +6,7 @@
 
     <groupId>com.github.nbbrd.jdplus-sdmx</groupId>
     <artifactId>jdplus-sdmx</artifactId>
-    <version>3.3.3</version>
+    <version>3.3.4</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -39,7 +39,7 @@
     <properties>
         <!-- Java 17 config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2026-01-23T10:34:10Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-02-17T13:55:45Z</project.build.outputTimestamp>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.release>17</maven.compiler.release>
@@ -56,13 +56,13 @@
         <jspecify.version>1.0.0</jspecify.version>
 
         <!-- test frameworks -->
-        <junit.version>6.0.2</junit.version>
-        <assertj-core.version>3.27.6</assertj-core.version>
+        <junit.version>6.0.3</junit.version>
+        <assertj-core.version>3.27.7</assertj-core.version>
 
         <!-- dependencies -->
         <jdplus-main.version>3.1.1</jdplus-main.version>
         <jdplus-main-netbeans.version>RELEASE190</jdplus-main-netbeans.version>
-        <sdmx-dl.version>3.0.0-beta.17</sdmx-dl.version>
+        <sdmx-dl.version>3.0.0-beta.18</sdmx-dl.version>
     </properties>
 
     <modules>
@@ -126,7 +126,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
+                    <version>3.15.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -162,7 +162,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.10.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
