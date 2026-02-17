@@ -62,7 +62,7 @@
         <!-- dependencies -->
         <jdplus-main.version>3.1.1</jdplus-main.version>
         <jdplus-main-netbeans.version>RELEASE190</jdplus-main-netbeans.version>
-        <sdmx-dl.version>3.0.0-beta.17</sdmx-dl.version>
+        <sdmx-dl.version>3.0.0-beta.18</sdmx-dl.version>
     </properties>
 
     <modules>
