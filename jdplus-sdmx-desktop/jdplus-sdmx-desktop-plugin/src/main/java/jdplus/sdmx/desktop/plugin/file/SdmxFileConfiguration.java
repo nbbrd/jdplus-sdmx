@@ -13,7 +13,7 @@ import sdmxdl.file.FileSource;
 import sdmxdl.file.SdmxFileManager;
 import sdmxdl.file.spi.FileCaching;
 import standalone_sdmxdl.nbbrd.io.text.Parser;
-import standalone_sdmxdl.sdmxdl.format.MemCachingSupport;
+import standalone_sdmxdl.sdmxdl.provider.caching.MemCachingSupport;
 
 import java.io.IOException;
 import java.util.Locale;
