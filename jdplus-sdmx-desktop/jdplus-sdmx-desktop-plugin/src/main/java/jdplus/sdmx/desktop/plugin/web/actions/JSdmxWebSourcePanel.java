@@ -39,8 +39,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -294,7 +294,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
 
     private static final class WebSourceModel extends ListTableModel<WebSource> {
 
-        private List<WebSource> values = Collections.emptyList();
+        private List<WebSource> values = List.of();
         private Languages languages = Languages.ANY;
 
         public void setValues(List<WebSource> values, Languages languages) {

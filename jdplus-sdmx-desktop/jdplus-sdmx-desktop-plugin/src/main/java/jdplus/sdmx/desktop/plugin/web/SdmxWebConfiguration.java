@@ -24,11 +24,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.Level;
-
-import static java.util.Collections.emptyMap;
 
 @lombok.extern.java.Log
 @lombok.Data
@@ -110,7 +109,7 @@ public class SdmxWebConfiguration {
     }
 
     private void logConfig() {
-        Function<? super String, ? extends CharSequence> properties = key -> PropertiesSupport.getProperty(emptyMap(), key);
+        Function<? super String, ? extends CharSequence> properties = key -> PropertiesSupport.getProperty(Map.of(), key);
         if (log.isLoggable(Level.INFO)) {
             for (Property<?> p : new Property<?>[]{RiRegistry.SOURCES_FILE_PROPERTY, RiNetworking.URL_BACKEND_PROPERTY}) {
                 log.log(Level.INFO, p.getKey() + ": " + p.get(properties));
