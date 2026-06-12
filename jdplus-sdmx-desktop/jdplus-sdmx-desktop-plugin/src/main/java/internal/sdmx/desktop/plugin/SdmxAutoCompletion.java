@@ -100,7 +100,7 @@ public abstract class SdmxAutoCompletion {
 
                 @Override
                 protected Icon toIcon(String term, JList list, WebSource value, int index, boolean isSelected, boolean cellHasFocus) {
-                    return SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), value.getWebsite(), list::repaint);
+                    return SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), value, list::repaint, 16);
                 }
             };
         }

@@ -77,7 +77,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
 
     @Override
     public Image getIconOrNull(int type, boolean opened) {
-        return SdmxIcons.getDefaultIcon().getImage();
+        return SdmxIcons.getDefaultIcon(16).getImage();
     }
 
     @Override
@@ -124,7 +124,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
         SdmxWebConfiguration editable = SdmxWebConfiguration.copyOf(configuration);
         PropertySheetDialogBuilder editor = new PropertySheetDialogBuilder()
                 .title("Configure " + lookupProvider().map(SdmxWebProvider::getDisplayName).orElse(""))
-                .icon(SdmxIcons.getDefaultIcon());
+                .icon(SdmxIcons.getDefaultIcon(16));
         if (editor.editSheet(editable.toSheet())) {
             configuration = editable;
             updateProvider();
@@ -147,7 +147,7 @@ public final class SdmxWebProviderBuddy implements DataSourceProviderBuddy, Conf
     }
 
     private static Image getSourceIcon(SdmxWebProvider provider, WebSource source) {
-        return ImageUtilities.icon2Image(SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), source.getWebsite()));
+        return ImageUtilities.icon2Image(SdmxIcons.getFavicon(provider.getSdmxManager().getNetworking(), source, 16));
     }
 
     private static boolean supportsDataQueryDetail(SdmxWebProvider provider, WebSource source) {

@@ -2,12 +2,15 @@ package internal.sdmx.desktop.plugin;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import nbbrd.design.ReturnNew;
+import nbbrd.design.swing.OnEDT;
 import nbbrd.desktop.favicon.DomainName;
 import nbbrd.desktop.favicon.FaviconRef;
 import nbbrd.desktop.favicon.FaviconSupport;
 import nbbrd.desktop.favicon.URLConnectionFactory;
-import org.jspecify.annotations.Nullable;
 import org.openide.util.ImageUtilities;
+import sdmxdl.Confidentiality;
+import sdmxdl.swing.SdmxLogo;
 import sdmxdl.web.WebSource;
 import sdmxdl.web.spi.Network;
 import sdmxdl.web.spi.Networking;
@@ -21,25 +24,40 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @lombok.experimental.UtilityClass
 public class SdmxIcons {
 
-    public static @NonNull ImageIcon getDefaultIcon() {
-        return ImageUtilities.loadImageIcon("jdplus/sdmx/desktop/plugin/sdmx-logo.png", false);
+    @OnEDT
+    public static @NonNull ImageIcon getDefaultIcon(int size) {
+        return LOGOS.computeIfAbsent(size, SdmxIcons::newSdmxLogo);
     }
 
-    public static @NonNull Icon getFavicon(@NonNull Networking networking, @Nullable URL website) {
-        return website != null
-                ? getFavicons(networking).getOrDefault(FaviconRef.of(DomainName.of(website), 16), getDefaultIcon())
-                : getDefaultIcon();
+    @OnEDT
+    public static @NonNull Icon getFavicon(@NonNull Networking networking, @NonNull WebSource source, int size) {
+        ImageIcon defaultIcon = getDefaultIcon(size);
+        URL website = source.getWebsite();
+        return website != null && isAllowed(source.getConfidentiality())
+                ? getFavicons(networking).getOrDefault(FaviconRef.of(DomainName.of(source.getWebsite()), size), defaultIcon)
+                : defaultIcon;
     }
 
-    public static @NonNull Icon getFavicon(@NonNull Networking networking, @Nullable URL website, @NonNull Runnable callback) {
-        return website != null
-                ? getFavicons(networking).getOrDefault(FaviconRef.of(DomainName.of(website), 16), callback, getDefaultIcon())
-                : getDefaultIcon();
+    @OnEDT
+    public static @NonNull Icon getFavicon(@NonNull Networking networking, @NonNull WebSource source, @NonNull Runnable callback, int size) {
+        ImageIcon defaultIcon = getDefaultIcon(size);
+        URL website = source.getWebsite();
+        return website != null && isAllowed(source.getConfidentiality())
+                ? getFavicons(networking).getOrDefault(FaviconRef.of(DomainName.of(website), size), callback, defaultIcon)
+                : defaultIcon;
     }
+
+    private static boolean isAllowed(Confidentiality confidentiality) {
+        return confidentiality.compareTo(MAX_CONFIDENTIALITY) <= 0;
+    }
+
+    private static final Confidentiality MAX_CONFIDENTIALITY = Confidentiality.PUBLIC;
 
     private static FaviconSupport getFavicons(Networking networking) {
         return FAVICONS
@@ -47,6 +65,13 @@ public class SdmxIcons {
                 .client(new FaviconClientOverCustomNetworking(networking))
                 .build();
     }
+
+    @ReturnNew
+    private static @NonNull ImageIcon newSdmxLogo(int size) {
+        return new ImageIcon(ImageUtilities.icon2Image(new SdmxLogo(size)));
+    }
+
+    private static final Map<Integer, ImageIcon> LOGOS = new HashMap<>();
 
     private static final FaviconSupport FAVICONS = FaviconSupport
             .ofServiceLoader()

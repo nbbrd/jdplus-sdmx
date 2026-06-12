@@ -4,6 +4,7 @@ import internal.sdmx.desktop.plugin.SdmxIcons;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
+import lombok.NonNull;
 import nbbrd.design.MightBeGenerated;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
@@ -15,6 +16,7 @@ import sdmxdl.file.spi.FileCaching;
 import standalone_sdmxdl.nbbrd.io.text.Parser;
 import standalone_sdmxdl.sdmxdl.provider.caching.MemCachingSupport;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -58,7 +60,7 @@ public class SdmxFileConfiguration {
     }
 
     private void reportError(FileSource source, String marker, CharSequence message, IOException error) {
-        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(16), "", null);
     }
 
     private FileCaching toCaching() {

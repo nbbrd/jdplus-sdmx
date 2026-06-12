@@ -25,7 +25,7 @@ public class SdmxRuntimeDependenciesTest {
                 .satisfies(SdmxRuntimeDependenciesTest::checkSdmxdl)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJavaDesktopUtil)
                 .satisfies(SdmxRuntimeDependenciesTest::checkJ2html)
-                .hasSize(4);
+                .hasSize(5);
     }
 
     private static void checkSdmx(List<? extends GAV> coordinates) {
@@ -40,7 +40,7 @@ public class SdmxRuntimeDependenciesTest {
         assertThatGroupId(coordinates, "com.github.nbbrd.sdmx-dl")
                 .has(sameVersion())
                 .extracting(GAV::getArtifactId)
-                .containsExactlyInAnyOrder("sdmx-dl-standalone");
+                .containsExactlyInAnyOrder("sdmx-dl-standalone", "sdmx-dl-swing");
     }
 
     private static void checkJavaDesktopUtil(List<? extends GAV> coordinates) {
