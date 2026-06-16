@@ -60,7 +60,7 @@ public final class SearchFlowAction extends AbilityNodeAction<DataSourceProvider
         if (d.getValue() == DialogDescriptor.OK_OPTION) {
             SdmxWebBean bean = provider.newBean();
             bean.setSource(panel.getSelection().getSource());
-            bean.setFlow(panel.getSelection().getFlow().toString());
+            bean.setFlow(panel.getSelection().getRequest().getFlow().toString());
             provider.open(provider.encodeBean(bean));
         }
     }

@@ -3,7 +3,6 @@ package jdplus.sdmx.desktop.plugin.web.actions;
 import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.desktop.plugin.OnDemandMenuBuilder;
 import internal.sdmx.desktop.plugin.SdmxCommand;
-import internal.sdmx.desktop.plugin.SdmxURI;
 import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.tsp.DataSet;
@@ -18,6 +17,7 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
 import sdmxdl.*;
+import sdmxdl.web.WebKeyRequest;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -57,22 +57,26 @@ public final class CopyPathSetAction extends AbilityNodeAction<DataSet> implemen
         DatabaseRef databaseRef = SdmxBeans.getDatabase(bean);
         FlowRef flowRef = FlowRef.parse(bean.getFlow());
         Key key = getKey(provider, bean.getSource(), databaseRef, flowRef, item);
-        KeyRequest keyRequest = KeyRequest
+        WebKeyRequest keyRequest = WebKeyRequest
                 .builder()
-                .languages(provider.getLanguages())
-                .database(databaseRef)
-                .flow(flowRef)
-                .key(key)
+                .source(bean.getSource())
+                .request(KeyRequest
+                        .builder()
+                        .languages(provider.getLanguages())
+                        .database(databaseRef)
+                        .flow(flowRef)
+                        .key(key)
+                        .build())
                 .build();
         new OnDemandMenuBuilder()
-                .copyToClipboard("SDMX-DL URI", SdmxURI.fromKeyRequest(bean.getSource(), keyRequest).toString())
+                .copyToClipboard("SDMX-DL URI", keyRequest.toString())
                 .copyToClipboard("Source", bean.getSource())
                 .copyToClipboard("Flow", flowRef.toShortString())
                 .copyToClipboard("Key", key.toString())
                 .addSeparator()
-                .copyToClipboard("Fetch data command", SdmxCommand.fetchData(bean.getSource(), keyRequest))
-                .copyToClipboard("Fetch meta command", SdmxCommand.fetchMeta(bean.getSource(), keyRequest))
-                .copyToClipboard("Fetch keys command", SdmxCommand.fetchKeys(bean.getSource(), keyRequest))
+                .copyToClipboard("Fetch data command", SdmxCommand.fetchData(keyRequest))
+                .copyToClipboard("Fetch meta command", SdmxCommand.fetchMeta(keyRequest))
+                .copyToClipboard("Fetch keys command", SdmxCommand.fetchKeys(keyRequest))
                 .showMenuAsPopup(null);
     }
 
