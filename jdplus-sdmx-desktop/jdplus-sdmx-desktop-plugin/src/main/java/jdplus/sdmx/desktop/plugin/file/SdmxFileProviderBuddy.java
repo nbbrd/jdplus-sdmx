@@ -25,11 +25,13 @@ import jdplus.toolkit.desktop.plugin.TsManager;
 import jdplus.toolkit.desktop.plugin.actions.Configurable;
 import jdplus.toolkit.desktop.plugin.properties.PropertySheetDialogBuilder;
 import jdplus.toolkit.desktop.plugin.tsproviders.DataSourceProviderBuddy;
+import lombok.NonNull;
 import nbbrd.design.DirectImpl;
 import nbbrd.service.ServiceProvider;
-import lombok.NonNull;
 import org.openide.nodes.Sheet;
+import org.openide.util.ImageUtilities;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +64,7 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
 
     @Override
     public Image getIconOrNull(int type, boolean opened) {
-        return SdmxIcons.getDefaultIcon().getImage();
+        return SdmxIcons.getDefaultIcon(16).getImage();
     }
 
     @Override
@@ -75,7 +77,7 @@ public final class SdmxFileProviderBuddy implements DataSourceProviderBuddy, Con
         SdmxFileConfiguration editable = SdmxFileConfiguration.copyOf(configuration);
         PropertySheetDialogBuilder editor = new PropertySheetDialogBuilder()
                 .title("Configure " + lookupProvider().map(SdmxFileProvider::getDisplayName).orElse(""))
-                .icon(SdmxIcons.getDefaultIcon());
+                .icon(SdmxIcons.getDefaultIcon(16));
         if (editor.editSheet(editable.toSheet())) {
             configuration = editable;
             updateProvider();

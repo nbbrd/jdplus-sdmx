@@ -51,7 +51,7 @@ interface SdmxFileParam extends DataSource.Converter<SdmxFileBean> {
                         .file(PropertyHandler.onFile("f", Path.of("").toFile()))
                         .structureFile(PropertyHandler.onFile("s", Path.of("").toFile()))
                         .dialect(PropertyHandler.onString("j", ""))
-                        .dimensions(PropertyHandler.onStringList("d", Collections.emptyList(), ','))
+                        .dimensions(PropertyHandler.onStringList("d", List.of(), ','))
                         .labelAttribute(PropertyHandler.onString("l", ""))
                         .build()
                         .asDataSourceConverter();

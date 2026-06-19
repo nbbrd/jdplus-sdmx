@@ -3,7 +3,6 @@ package jdplus.sdmx.desktop.plugin.web.actions;
 import internal.sdmx.base.api.SdmxBeans;
 import internal.sdmx.desktop.plugin.OnDemandMenuBuilder;
 import internal.sdmx.desktop.plugin.SdmxCommand;
-import internal.sdmx.desktop.plugin.SdmxURI;
 import jdplus.sdmx.base.api.web.SdmxWebBean;
 import jdplus.sdmx.base.api.web.SdmxWebProvider;
 import jdplus.toolkit.base.tsp.DataSource;
@@ -16,7 +15,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.actions.Presenter;
 import sdmxdl.FlowRequest;
-import sdmxdl.KeyRequest;
+import sdmxdl.web.WebFlowRequest;
+import sdmxdl.web.WebKeyRequest;
 
 import javax.swing.*;
 import java.util.List;
@@ -49,20 +49,24 @@ public final class CopyPathSourceAction extends AbilityNodeAction<DataSource> im
         DataSource item = single(items).orElseThrow(NoSuchElementException::new);
         SdmxWebProvider provider = providerOf(item).orElseThrow(NoSuchElementException::new);
         SdmxWebBean bean = provider.decodeBean(item);
-        FlowRequest flowRequest = FlowRequest
+        WebFlowRequest flowRequest = WebFlowRequest
                 .builder()
-                .languages(provider.getLanguages())
-                .database(SdmxBeans.getDatabase(bean))
-                .flowOf(bean.getFlow())
+                .source(bean.getSource())
+                .request(FlowRequest
+                        .builder()
+                        .languages(provider.getLanguages())
+                        .database(SdmxBeans.getDatabase(bean))
+                        .flowOf(bean.getFlow())
+                        .build())
                 .build();
         new OnDemandMenuBuilder()
-                .copyToClipboard("SDMX-DL URI", SdmxURI.fromFlowRequest(bean.getSource(), flowRequest).toString())
+                .copyToClipboard("SDMX-DL URI", flowRequest.toString())
                 .copyToClipboard("Source", bean.getSource())
-                .copyToClipboard("Flow", flowRequest.getFlow().toShortString())
+                .copyToClipboard("Flow", flowRequest.getRequest().getFlow().toShortString())
                 .addSeparator()
-                .copyToClipboard("List dimensions command", SdmxCommand.listDimensions(bean.getSource(), flowRequest))
-                .copyToClipboard("List attributes command", SdmxCommand.listAttributes(bean.getSource(), flowRequest))
-                .copyToClipboard("Fetch all keys command", SdmxCommand.fetchKeys(bean.getSource(), KeyRequest.builderOf(flowRequest).build()))
+                .copyToClipboard("List dimensions command", SdmxCommand.listDimensions(flowRequest))
+                .copyToClipboard("List attributes command", SdmxCommand.listAttributes(flowRequest))
+                .copyToClipboard("Fetch all keys command", SdmxCommand.fetchKeys(WebKeyRequest.builderOf(flowRequest).build()))
                 .showMenuAsPopup(null);
     }
 

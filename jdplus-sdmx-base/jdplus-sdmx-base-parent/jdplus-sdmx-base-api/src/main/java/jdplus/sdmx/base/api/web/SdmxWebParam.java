@@ -25,7 +25,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -49,7 +48,7 @@ interface SdmxWebParam extends DataSource.Converter<SdmxWebBean> {
                         .builder()
                         .source(PropertyHandler.onString("dbName", ""))
                         .flow(PropertyHandler.onString("tableName", ""))
-                        .dimensions(PropertyHandler.onStringList("dimColumns", Collections.emptyList(), 'c'))
+                        .dimensions(PropertyHandler.onStringList("dimColumns", List.of(), 'c'))
                         .labelAttribute(PropertyHandler.onString("l", ""))
                         .cache(
                                 BulkCubeHandler

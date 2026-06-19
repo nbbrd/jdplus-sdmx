@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-06-19
+
+This is a feature release of SDMX extensions for JDemetra+ v3.  
+[JDemetra+ v3.1.1 or later](https://github.com/jdemetra/jdplus-main) version is required to run it.
+
+### Added
+
+- Add experimental browse & search tools
+
+### Changed
+
+- Bump sdmx-dl from 3.0.0-beta.18 to [3.1.1](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.1.1)
+- Bump java-desktop-util-favicon from 2.6.0 to [2.7.0](https://github.com/nbbrd/java-desktop-util/releases/tag/v2.7.0)
+- Replaced sdmx-logo png with a vectorial one
+
 ## [3.3.4] - 2026-02-17
 
 This is a bugfix release of SDMX extensions for JDemetra+ v3.  
@@ -68,13 +83,13 @@ This is a feature release of SDMX extensions for JDemetra+ v3.
 
 - Add logging of events
 
-### Fixed
-
-- Fix sources file property in configuration
-
 ### Changed
 
 - Bump sdmx-dl from 3.0.0-beta.12 to [3.0.0-beta.13](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.13)
+
+### Fixed
+
+- Fix sources file property in configuration
 
 ## [3.1.0] - 2023-10-16
 
@@ -85,14 +100,14 @@ This is a feature release of SDMX extensions for JDemetra+ v3.
 
 - Allow configuration by environment variables
 
+### Changed
+
+- Bump sdmx-dl from 3.0.0-beta.11 to [3.0.0-beta.12](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.12)
+
 ### Fixed
 
 - Fix favicons transparency, cache and loading
 - Fix dimensions and attributes autocompletion
-
-### Changed
-
-- Bump sdmx-dl from 3.0.0-beta.11 to [3.0.0-beta.12](https://github.com/nbbrd/sdmx-dl/releases/tag/v3.0.0-beta.12)
 
 ## [3.0.0] - 2023-06-14
 
@@ -103,7 +118,8 @@ This is the **initial release** of SDMX extensions for JDemetra+ v3.
 
 - Initial release
 
-[Unreleased]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.4...HEAD
+[Unreleased]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.4...v3.4.0
 [3.3.4]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.3...v3.3.4
 [3.3.3]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.2...v3.3.3
 [3.3.2]: https://github.com/nbbrd/jdplus-sdmx/compare/v3.3.1...v3.3.2

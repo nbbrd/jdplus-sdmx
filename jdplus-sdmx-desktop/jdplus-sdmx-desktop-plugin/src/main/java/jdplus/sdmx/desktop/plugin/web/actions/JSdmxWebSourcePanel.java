@@ -39,8 +39,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -201,7 +201,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
                 JLabel result = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (value instanceof WebSource source) {
                     result.setText(source.getId());
-                    result.setIcon(SdmxIcons.getFavicon(sdmxManager.getNetworking(), source.getWebsite(), table::repaint));
+                    result.setIcon(SdmxIcons.getFavicon(sdmxManager.getNetworking(), source, table::repaint, 16));
                 }
                 return result;
             }
@@ -294,7 +294,7 @@ public final class JSdmxWebSourcePanel extends JComponent {
 
     private static final class WebSourceModel extends ListTableModel<WebSource> {
 
-        private List<WebSource> values = Collections.emptyList();
+        private List<WebSource> values = List.of();
         private Languages languages = Languages.ANY;
 
         public void setValues(List<WebSource> values, Languages languages) {

@@ -5,6 +5,7 @@ import jdplus.sdmx.desktop.plugin.Toggle;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import jdplus.toolkit.desktop.plugin.properties.NodePropertySetBuilder;
 import jdplus.toolkit.desktop.plugin.util.Persistence;
+import lombok.NonNull;
 import nbbrd.design.MightBeGenerated;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.awt.StatusDisplayer;
@@ -20,15 +21,15 @@ import standalone_sdmxdl.sdmxdl.provider.ri.caching.RiCaching;
 import standalone_sdmxdl.sdmxdl.provider.ri.networking.RiNetworking;
 import standalone_sdmxdl.sdmxdl.provider.ri.registry.RiRegistry;
 
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.Level;
-
-import static java.util.Collections.emptyMap;
 
 @lombok.extern.java.Log
 @lombok.Data
@@ -110,7 +111,7 @@ public class SdmxWebConfiguration {
     }
 
     private void logConfig() {
-        Function<? super String, ? extends CharSequence> properties = key -> PropertiesSupport.getProperty(emptyMap(), key);
+        Function<? super String, ? extends CharSequence> properties = key -> PropertiesSupport.getProperty(Map.of(), key);
         if (log.isLoggable(Level.INFO)) {
             for (Property<?> p : new Property<?>[]{RiRegistry.SOURCES_FILE_PROPERTY, RiNetworking.URL_BACKEND_PROPERTY}) {
                 log.log(Level.INFO, p.getKey() + ": " + p.get(properties));
@@ -135,7 +136,7 @@ public class SdmxWebConfiguration {
     }
 
     private void reportError(WebSource source, String marker, CharSequence message, IOException error) {
-        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(), "", null);
+        NotificationDisplayer.getDefault().notify(message.toString(), SdmxIcons.getDefaultIcon(16), "", null);
         log.log(Level.SEVERE, error, () -> asLogMessage(source, marker, message));
     }
 
