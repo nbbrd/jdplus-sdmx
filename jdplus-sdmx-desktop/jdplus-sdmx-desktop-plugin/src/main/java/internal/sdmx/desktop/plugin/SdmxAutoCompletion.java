@@ -55,6 +55,10 @@ public abstract class SdmxAutoCompletion {
         return new WebSourceCompletion(provider);
     }
 
+    public static @NonNull SdmxAutoCompletion onDatabase(@NonNull SdmxWebProvider provider, @NonNull SdmxWebBean bean, @NonNull ConcurrentMap<Object, Object> cache) {
+        return new DatabaseCompletion<>(provider, () -> SdmxBeans.getWebSourceOrNull(bean, provider), cache);
+    }
+
     public static @NonNull SdmxAutoCompletion onFlow(@NonNull SdmxWebProvider provider, @NonNull SdmxWebBean bean, @NonNull ConcurrentMap<Object, Object> cache) {
         return new FlowCompletion<>(provider, () -> SdmxBeans.getWebSourceOrNull(bean, provider), () -> SdmxBeans.getDatabase(bean), cache);
     }
@@ -128,6 +132,60 @@ public abstract class SdmxAutoCompletion {
     }
 
     @lombok.AllArgsConstructor
+    private static final class DatabaseCompletion<S extends Source> extends SdmxAutoCompletion {
+
+        private final @NonNull HasSdmxProperties<? extends SdmxManager<S>> provider;
+
+        private final @NonNull Supplier<S> source;
+
+        private final @NonNull ConcurrentMap<Object, Object> cache;
+
+        @Override
+        public @NonNull AutoCompletionSource getSource() {
+            return ExtAutoCompletionSource
+                    .builder(this::load)
+                    .behavior(this::getBehavior)
+                    .postProcessor(this::filterAndSort)
+                    .valueToString(o -> o.getRef().toString())
+                    .cache(cache, this::getCacheKey, SYNC)
+                    .build();
+        }
+
+        @Override
+        public @NonNull ListCellRenderer<?> getRenderer() {
+            return CustomListCellRenderer.<Database>of(flow -> flow.getRef() + "<br><i>" + flow.getName(), flow -> flow.getRef().toString());
+        }
+
+        private List<Database> load(String term) throws Exception {
+            return new ArrayList<>(
+                    provider
+                            .getSdmxManager()
+                            .using(source.get())
+                            .getDatabases(SourceRequest
+                                    .builder()
+                                    .languages(provider.getLanguages())
+                                    .build())
+            );
+        }
+
+        private AutoCompletionSource.Behavior getBehavior(String term) {
+            return source.get() != null ? ASYNC : NONE;
+        }
+
+        private List<Database> filterAndSort(List<Database> values, String term) {
+            Predicate<String> filter = ExtAutoCompletionSource.basicFilter(term);
+            return values.stream()
+                    .filter(o -> filter.test(o.getName()) || filter.test(o.getRef().getId()))
+                    .sorted(comparing(Database::getName))
+                    .collect(toList());
+        }
+
+        private String getCacheKey(String term) {
+            return "Database" + source.get() + provider.getLanguages();
+        }
+    }
+
+    @lombok.AllArgsConstructor
     private static final class FlowCompletion<S extends Source> extends SdmxAutoCompletion {
 
         private final @NonNull HasSdmxProperties<? extends SdmxManager<S>> provider;
@@ -180,7 +238,7 @@ public abstract class SdmxAutoCompletion {
         }
 
         private String getCacheKey(String term) {
-            return "Dataflow" + source.get() + provider.getLanguages();
+            return "Dataflow" + source.get() + database.get() + provider.getLanguages();
         }
     }
 
@@ -240,7 +298,7 @@ public abstract class SdmxAutoCompletion {
         }
 
         private String getCacheKey(String term) {
-            return "Dimension" + source.get() + flowRef.get() + provider.getLanguages();
+            return "Dimension" + source.get() + database.get() + flowRef.get() + provider.getLanguages();
         }
     }
 
@@ -302,7 +360,7 @@ public abstract class SdmxAutoCompletion {
         }
 
         private String getCacheKey(String term) {
-            return "Attribute" + source.get() + flowRef.get() + provider.getLanguages();
+            return "Attribute" + source.get() + database.get() + flowRef.get() + provider.getLanguages();
         }
     }
 }

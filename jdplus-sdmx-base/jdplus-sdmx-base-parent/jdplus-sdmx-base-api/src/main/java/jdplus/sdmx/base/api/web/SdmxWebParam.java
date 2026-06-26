@@ -22,6 +22,7 @@ import jdplus.toolkit.base.tsp.cube.*;
 import jdplus.toolkit.base.tsp.util.PropertyHandler;
 import lombok.NonNull;
 import org.jspecify.annotations.Nullable;
+import sdmxdl.DatabaseRef;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -47,6 +48,7 @@ interface SdmxWebParam extends DataSource.Converter<SdmxWebBean> {
                 SdmxWebBeanHandler
                         .builder()
                         .source(PropertyHandler.onString("dbName", ""))
+                        .database(PropertyHandler.onString("db", DatabaseRef.NO_DATABASE.toString()))
                         .flow(PropertyHandler.onString("tableName", ""))
                         .dimensions(PropertyHandler.onStringList("dimColumns", List.of(), 'c'))
                         .labelAttribute(PropertyHandler.onString("l", ""))
@@ -78,6 +80,9 @@ interface SdmxWebParam extends DataSource.Converter<SdmxWebBean> {
         private final PropertyHandler<String> source;
 
         @lombok.NonNull
+        private final PropertyHandler<String> database;
+
+        @lombok.NonNull
         private final PropertyHandler<String> flow;
 
         @lombok.NonNull
@@ -93,6 +98,7 @@ interface SdmxWebParam extends DataSource.Converter<SdmxWebBean> {
         public @NonNull SdmxWebBean get(@NonNull Function<? super String, ? extends CharSequence> properties) {
             SdmxWebBean result = new SdmxWebBean();
             result.setSource(source.get(properties));
+            result.setDatabase(database.get(properties));
             result.setFlow(flow.get(properties));
             result.setDimensions(dimensions.get(properties));
             result.setLabelAttribute(labelAttribute.get(properties));
@@ -104,6 +110,7 @@ interface SdmxWebParam extends DataSource.Converter<SdmxWebBean> {
         public void set(@NonNull BiConsumer<? super String, ? super String> properties, @Nullable SdmxWebBean value) {
             if (value != null) {
                 source.set(properties, value.getSource());
+                database.set(properties, value.getDatabase());
                 flow.set(properties, value.getFlow());
                 dimensions.set(properties, value.getDimensions());
                 labelAttribute.set(properties, value.getLabelAttribute());

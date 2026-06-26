@@ -22,8 +22,8 @@ public final class SdmxBeans {
         return provider.getSdmxManager().getSources().get(bean.getSource());
     }
 
-    public static DatabaseRef getDatabase(SdmxWebBean ignore) {
-        return DatabaseRef.NO_DATABASE;
+    public static DatabaseRef getDatabase(SdmxWebBean bean) {
+        return bean.getDatabase() != null ? DatabaseRef.parse(bean.getDatabase()) : DatabaseRef.NO_DATABASE;
     }
 
     public static DatabaseRef getDatabase(SdmxFileBean ignore) {

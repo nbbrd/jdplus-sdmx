@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Add support of databases in UI
+
 ## [3.4.0] - 2026-06-19
 
 This is a feature release of SDMX extensions for JDemetra+ v3.  

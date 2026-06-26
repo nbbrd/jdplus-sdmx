@@ -62,7 +62,7 @@
         <!-- dependencies -->
         <jdplus-main.version>3.1.1</jdplus-main.version>
         <jdplus-main-netbeans.version>RELEASE190</jdplus-main-netbeans.version>
-        <sdmx-dl.version>3.1.1</sdmx-dl.version>
+        <sdmx-dl.version>3.1.2-SNAPSHOT</sdmx-dl.version>
         <heylogs.version>0.19.1</heylogs.version>
     </properties>
 
