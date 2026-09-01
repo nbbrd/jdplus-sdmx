@@ -28,6 +28,7 @@ import java.util.List;
 public final class SdmxWebBean {
 
     private String source;
+    private String database;
     private String flow;
     private List<String> dimensions;
     private String labelAttribute;

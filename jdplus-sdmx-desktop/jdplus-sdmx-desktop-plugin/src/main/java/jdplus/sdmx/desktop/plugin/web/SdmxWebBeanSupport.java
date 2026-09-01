@@ -37,6 +37,8 @@ class SdmxWebBeanSupport {
     @NbBundle.Messages({
             "bean.source.display=Provider",
             "bean.source.description=The identifier of the service that provides data.",
+            "bean.database.display=Database",
+            "bean.database.description=Optional top-level grouping",
             "bean.flow.display=Dataflow",
             "bean.flow.description=The identifier of a specific dataflow.",})
     private static NodePropertySetBuilder withSource(NodePropertySetBuilder b, SdmxWebBean bean, SdmxWebProvider provider, ConcurrentMap<Object, Object> autoCompletionCache) {
@@ -45,6 +47,16 @@ class SdmxWebBeanSupport {
                 .servicePath(WebSource.class.getName())
                 .display(Bundle.bean_source_display())
                 .description(Bundle.bean_source_description())
+                .add();
+
+        SdmxAutoCompletion database = SdmxAutoCompletion.onDatabase(provider, bean, autoCompletionCache);
+
+        b.withAutoCompletion()
+                .select("database", bean::getDatabase, bean::setDatabase)
+                .source(database.getSource())
+                .cellRenderer(database.getRenderer())
+                .display(Bundle.bean_database_display())
+                .description(Bundle.bean_database_description())
                 .add();
 
         SdmxAutoCompletion dataflow = SdmxAutoCompletion.onFlow(provider, bean, autoCompletionCache);
