@@ -1,3 +1,6 @@
+> [!IMPORTANT] 
+> This plugin has been migrated to the [main repository of JDemetra+](https://github.com/jdemetra/jdplus-main) and is now archived.
+
 # SDMX extensions for JDemetra+ v3
 
 [![Download](https://img.shields.io/github/release/nbbrd/jdplus-sdmx.svg)](https://github.com/nbbrd/jdplus-sdmx/releases/latest)
